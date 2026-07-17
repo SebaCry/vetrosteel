@@ -1,0 +1,49 @@
+---
+// Drop each member's photo into /public/images/team/<file> and it replaces the
+// initials automatically. Until then, the monogram shows as a graceful fallback.
+const team = [
+  { name: 'Wilson Avila', role: 'President', initials: 'WA', file: '/images/team/wilson.png' },
+  { name: 'Eyen Rivera', role: 'Chief Executive Officer', initials: 'ER', file: '/images/team/eyenrivera.png' },
+  { name: 'Simon Avila', role: 'Chief Operations Officer', initials: 'SA', file: '/images/team/simonavila.png' },
+  { name: 'Jacobo Avila', role: 'VP Marketing', initials: 'JA', file: '/images/team/jacoboavila.png' },
+];
+---
+
+<section id="team" class="relative bg-paper text-ink py-24 sm:py-32">
+  <div class="mx-auto max-w-7xl px-5 sm:px-8">
+    <div class="max-w-2xl mb-16" data-reveal>
+      <p class="eyebrow text-teal mb-6 flex items-center gap-3">
+        <span class="inline-block w-9 h-px bg-sand rule-draw"></span>
+        Meet the team
+      </p>
+      <h2 class="font-display font-semibold text-4xl sm:text-5xl leading-[1.1] text-deep-teal">
+        The people behind the precision
+      </h2>
+    </div>
+
+    <div class="grid grid-cols-2 lg:grid-cols-4 gap-6 sm:gap-8">
+      {team.map((m, i) => (
+        <article class="group" data-reveal style={`--reveal-delay:${i * 90}ms`}>
+          <div class="relative aspect-[4/5] overflow-hidden bg-deep-teal flex items-center justify-center">
+            <div class="absolute inset-0 blueprint-grid opacity-30"></div>
+            <!-- fallback monogram (sits behind the photo) -->
+            <span class="font-display text-5xl sm:text-6xl font-semibold text-warm-gray/90 group-hover:text-sand transition-colors duration-500 tracking-widest">
+              {m.initials}
+            </span>
+            <!-- photo: hides itself if the file isn't present yet -->
+            <img
+              src={m.file}
+              alt={`${m.name}, ${m.role}`}
+              class="absolute inset-0 w-full h-full object-cover duotone group-hover:scale-[1.03] transition-transform duration-700"
+              loading="lazy"
+              onerror="this.style.display='none'"
+            />
+            <span class="absolute bottom-0 inset-x-0 h-1 bg-sand scale-x-0 group-hover:scale-x-100 origin-left transition-transform duration-500 z-10"></span>
+          </div>
+          <h3 class="mt-5 font-display text-lg font-semibold text-deep-teal tracking-wide">{m.name}</h3>
+          <p class="mt-1 text-sm tracking-[0.14em] uppercase text-ink/50">{m.role}</p>
+        </article>
+      ))}
+    </div>
+  </div>
+</section>

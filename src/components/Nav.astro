@@ -1,0 +1,97 @@
+---
+import Logo from './Logo.astro';
+
+const links = [
+  { label: 'About', href: '#about' },
+  { label: 'Services', href: '#services' },
+  { label: 'Work', href: '#work' },
+  { label: 'Values', href: '#values' },
+  { label: 'Team', href: '#team' },
+];
+---
+
+<header
+  id="site-nav"
+  class="fixed top-0 inset-x-0 z-50 transition-all duration-500 border-b border-transparent"
+>
+  <nav class="mx-auto max-w-7xl px-5 sm:px-8 flex items-center justify-between h-[74px]">
+    <a href="#top" class="flex items-center" aria-label="Vetro Steel — inicio">
+      <Logo variant="full" tone="light" />
+    </a>
+
+    <div class="hidden md:flex items-center gap-9">
+      {links.map((l) => (
+        <a
+          href={l.href}
+          class="text-[0.82rem] tracking-[0.14em] uppercase font-medium text-warm-gray/75 hover:text-sand transition-colors duration-300"
+        >
+          {l.label}
+        </a>
+      ))}
+      <a
+        href="#contact"
+        class="text-[0.82rem] tracking-[0.14em] uppercase font-semibold text-ink bg-sand px-5 py-2.5 hover:bg-sand-bright transition-colors duration-300"
+      >
+        Contact
+      </a>
+    </div>
+
+    <button
+      id="menu-toggle"
+      class="md:hidden text-warm-gray p-2 -mr-2"
+      aria-label="Abrir menú"
+      aria-expanded="false"
+    >
+      <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+        <path d="M3 6h18M3 12h18M3 18h18" stroke-linecap="round" />
+      </svg>
+    </button>
+  </nav>
+
+  <!-- Mobile panel -->
+  <div
+    id="mobile-menu"
+    class="md:hidden overflow-hidden max-h-0 transition-[max-height] duration-500 ease-out bg-ink/98 backdrop-blur border-t border-white/5"
+  >
+    <div class="px-6 py-6 flex flex-col gap-5">
+      {links.map((l) => (
+        <a href={l.href} class="text-sm tracking-[0.18em] uppercase text-warm-gray/85 hover:text-sand transition-colors" data-close>
+          {l.label}
+        </a>
+      ))}
+      <a href="#contact" class="text-sm tracking-[0.18em] uppercase font-semibold text-ink bg-sand px-5 py-3 text-center" data-close>
+        Contact
+      </a>
+    </div>
+  </div>
+</header>
+
+<script>
+  const nav = document.getElementById('site-nav');
+  const onScroll = () => {
+    if (!nav) return;
+    if (window.scrollY > 24) {
+      nav.classList.add('bg-ink/90', 'backdrop-blur-md', 'border-white/5', 'shadow-[0_10px_40px_-20px_rgba(0,0,0,0.8)]');
+      nav.classList.remove('border-transparent');
+    } else {
+      nav.classList.remove('bg-ink/90', 'backdrop-blur-md', 'border-white/5', 'shadow-[0_10px_40px_-20px_rgba(0,0,0,0.8)]');
+      nav.classList.add('border-transparent');
+    }
+  };
+  window.addEventListener('scroll', onScroll, { passive: true });
+  onScroll();
+
+  const toggle = document.getElementById('menu-toggle');
+  const menu = document.getElementById('mobile-menu');
+  const setOpen = (open: boolean) => {
+    if (!menu || !toggle) return;
+    menu.style.maxHeight = open ? menu.scrollHeight + 'px' : '0px';
+    toggle.setAttribute('aria-expanded', String(open));
+    toggle.setAttribute('aria-label', open ? 'Cerrar menú' : 'Abrir menú');
+  };
+  let open = false;
+  toggle?.addEventListener('click', () => { open = !open; setOpen(open); });
+  document.querySelectorAll('[data-close]').forEach((el) =>
+    el.addEventListener('click', () => { open = false; setOpen(false); })
+  );
+</script>

@@ -1,0 +1,76 @@
+---
+// NOTE: update the email below to the client's real inbox before going live.
+const email = 'info@vetrosteel.com';
+const taglines = [
+  'Precision Built in Steel & Glass',
+  'Where Design Becomes Structure',
+  'Turning Concepts Into Architectural Reality',
+  'Designed to Fit. Built to Last.',
+];
+---
+
+<section id="contact" class="relative bg-ink text-warm-gray overflow-hidden">
+  <!-- taglines marquee -->
+  <div class="border-y border-white/8 py-5 overflow-hidden" aria-hidden="true">
+    <div class="marquee flex gap-10 whitespace-nowrap w-max">
+      {[...taglines, ...taglines].map((t) => (
+        <span class="flex items-center gap-10 font-display text-sm tracking-[0.2em] uppercase text-warm-gray/40">
+          {t}
+          <span class="inline-block w-1.5 h-1.5 rotate-45 bg-sand/70"></span>
+        </span>
+      ))}
+    </div>
+  </div>
+
+  <div class="relative py-24 sm:py-32">
+    <div class="absolute inset-0 blueprint-grid opacity-30"></div>
+    <div class="relative mx-auto max-w-4xl px-5 sm:px-8 text-center">
+      <p class="eyebrow text-sand mb-8 inline-flex items-center gap-3" data-reveal>
+        <span class="inline-block w-9 h-px bg-sand rule-draw"></span>
+        Let's talk
+        <span class="inline-block w-9 h-px bg-sand"></span>
+      </p>
+
+      <h2 class="font-display font-semibold text-4xl sm:text-6xl leading-[1.08] text-warm-gray" data-reveal style="--reveal-delay:100ms">
+        Let's build something<br />
+        <span class="text-sand">made to last</span>
+      </h2>
+
+      <p class="mt-8 max-w-xl mx-auto text-base sm:text-lg leading-relaxed text-warm-gray/65" data-reveal style="--reveal-delay:200ms">
+        Tell us about your stainless steel and glass project. We turn your
+        concept into drawings that are ready to fabricate and install.
+      </p>
+
+      <div class="mt-10 flex flex-col sm:flex-row items-center justify-center gap-4" data-reveal style="--reveal-delay:300ms">
+        <a
+          href={`mailto:${email}?subject=New%20project%20—%20Vetro%20Steel`}
+          class="group inline-flex items-center justify-center gap-2 bg-sand text-ink font-semibold uppercase tracking-[0.14em] text-[0.82rem] px-8 py-4 hover:bg-sand-bright transition-colors duration-300"
+        >
+          Get in touch
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="transition-transform duration-300 group-hover:translate-x-1">
+            <path d="M5 12h14M13 6l6 6-6 6" stroke-linecap="round" stroke-linejoin="round" />
+          </svg>
+        </a>
+        <a
+          href={`mailto:${email}`}
+          class="text-warm-gray/80 tracking-[0.08em] hover:text-sand transition-colors border-b border-transparent hover:border-sand pb-0.5"
+        >
+          {email}
+        </a>
+      </div>
+    </div>
+  </div>
+</section>
+
+<style>
+  @keyframes marquee {
+    from { transform: translateX(0); }
+    to { transform: translateX(-50%); }
+  }
+  .marquee {
+    animation: marquee 34s linear infinite;
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .marquee { animation: none; }
+  }
+</style>

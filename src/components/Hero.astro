@@ -1,0 +1,129 @@
+---
+// Radiating "cable" lines — evokes the cable-stayed bridge of the brand deck
+// and the vanishing-point perspective of a technical drawing.
+// viewBox is 160x100 — the same 16:10 aspect as the hero — so scaling is
+// uniform (no distortion) and nothing is cropped. Cables fan from a single
+// point near the top and descend across the sheet, echoing the cable-stayed
+// bridge of the brand deck and a technical perspective drawing.
+const vx = 108; // vanishing point x (of 160)
+const vy = 6; // vanishing point y (of 100)
+const rays = Array.from({ length: 26 }, (_, i) => {
+  const t = i / 25;
+  const x2 = 178 - t * 210; // endpoints sweep the bottom edge, right → left
+  const y2 = 118; // just past the bottom edge
+  const strong = i % 4 === 0;
+  return { x1: vx, y1: vy, x2, y2, strong };
+});
+---
+
+<section id="top" class="relative isolate min-h-[100svh] flex items-center overflow-hidden bg-ink">
+  <!-- Layered background: gradient + blueprint grid + radiating cables -->
+  <div class="absolute inset-0 -z-10">
+    <div
+      class="absolute inset-0"
+      style="background:
+        radial-gradient(110% 95% at 68% 0%, #1a5563 0%, #0e3742 42%, #071e24 100%);"
+    >
+    </div>
+    <!-- architectural backdrop: glass towers converging up, tinted to the teal
+         and aligned with the cables' vanishing point -->
+    <img
+      src="/images/arch/tower-1.jpg"
+      alt=""
+      aria-hidden="true"
+      class="absolute inset-0 w-full h-full object-cover duotone opacity-[0.35] mix-blend-luminosity"
+      style="object-position: 62% top;"
+      loading="eager"
+    />
+    <div class="absolute inset-0 blueprint-grid opacity-70"></div>
+
+    <svg
+      class="absolute inset-0 w-full h-full"
+      viewBox="0 0 160 100"
+      preserveAspectRatio="xMidYMid slice"
+      aria-hidden="true"
+    >
+      {rays.map((r, i) => (
+        <line
+          x1={r.x1} y1={r.y1} x2={r.x2} y2={r.y2}
+          stroke={r.strong ? '#d9c39c' : '#a7c4c9'}
+          stroke-width={r.strong ? 2 : 1}
+          vector-effect="non-scaling-stroke"
+          opacity={r.strong ? 0.85 : 0.5}
+          class="ray"
+          style={`--i:${i}`}
+        />
+      ))}
+      <!-- vanishing point node -->
+      <circle cx={vx} cy={vy} r="0.7" fill="#c8b28a" opacity="0.8" />
+    </svg>
+
+    <!-- vignette for legibility -->
+    <div class="absolute inset-0" style="background:linear-gradient(90deg, rgba(7,30,36,0.92) 0%, rgba(7,30,36,0.72) 34%, rgba(7,30,36,0.22) 62%, transparent 82%);"></div>
+    <div class="absolute inset-x-0 bottom-0 h-40" style="background:linear-gradient(to top,#071e24, transparent);"></div>
+  </div>
+
+  <div class="mx-auto max-w-7xl w-full px-5 sm:px-8 pt-28 pb-20">
+    <div class="max-w-3xl">
+      <p class="eyebrow text-light-teal mb-7 flex items-center gap-3" data-reveal>
+        <span class="inline-block w-9 h-px bg-sand"></span>
+        Design · Modeling · Stainless Steel &amp; Glass
+      </p>
+
+      <h1 class="font-display font-semibold text-warm-gray leading-[1.05] text-5xl sm:text-6xl lg:text-7xl" data-reveal style="--reveal-delay:80ms">
+        Precision.<br />
+        <span class="text-sand">Strength.</span><br />
+        Elegance.
+      </h1>
+
+      <p class="mt-8 max-w-xl text-base sm:text-lg leading-relaxed text-warm-gray/75" data-reveal style="--reveal-delay:200ms">
+        We turn concepts into architectural solutions in stainless steel and
+        glass — ready for fabrication and installation. Technical precision,
+        expert guidance, and strategic supply of premium components, all in
+        one partner.
+      </p>
+
+      <div class="mt-10 flex flex-col sm:flex-row gap-4" data-reveal style="--reveal-delay:320ms">
+        <a
+          href="#services"
+          class="group inline-flex items-center justify-center gap-2 bg-sand text-ink font-semibold uppercase tracking-[0.14em] text-[0.82rem] px-7 py-4 hover:bg-sand-bright transition-colors duration-300"
+        >
+          Our services
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="transition-transform duration-300 group-hover:translate-x-1">
+            <path d="M5 12h14M13 6l6 6-6 6" stroke-linecap="round" stroke-linejoin="round" />
+          </svg>
+        </a>
+        <a
+          href="#contact"
+          class="inline-flex items-center justify-center gap-2 border border-light-teal/40 text-warm-gray font-semibold uppercase tracking-[0.14em] text-[0.82rem] px-7 py-4 hover:border-sand hover:text-sand transition-colors duration-300"
+        >
+          Start a project
+        </a>
+      </div>
+    </div>
+  </div>
+
+  <!-- bottom credential strip -->
+  <div class="absolute bottom-0 inset-x-0 border-t border-white/5">
+    <div class="mx-auto max-w-7xl px-5 sm:px-8 py-5 flex flex-wrap items-center gap-x-8 gap-y-2 text-[0.7rem] tracking-[0.22em] uppercase text-warm-gray/45">
+      <span class="text-sand/80">Utah · USA</span>
+      <span class="hidden sm:inline">Shop Drawings &amp; Technical Modeling</span>
+      <span class="hidden md:inline">Stainless Steel · Tempered Glass</span>
+    </div>
+  </div>
+</section>
+
+<style>
+  @keyframes ray-in {
+    from { opacity: 0; }
+  }
+  .ray {
+    /* base opacity comes from each line's `opacity` attribute;
+       `both` fill keeps it hidden during the stagger delay, then holds the end */
+    animation: ray-in 1.3s var(--ease-out-expo, cubic-bezier(0.16,1,0.3,1)) both;
+    animation-delay: calc(var(--i) * 40ms + 200ms);
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .ray { animation: none; }
+  }
+</style>

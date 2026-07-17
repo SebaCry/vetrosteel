@@ -1,0 +1,81 @@
+---
+const horizons = [
+  {
+    tag: 'Near term',
+    label: 'Short-term',
+    body: 'Establish Vetro Steel Design as a trusted, strategic brand within the stainless steel and glass industry in Utah. We are perfecting a highly efficient remote operation and becoming the technical support of choice for contractors, architects and supply companies.',
+    points: ['High-precision remote operation', 'Strategic partnerships', 'Seamless integration on site'],
+  },
+  {
+    tag: 'Long horizon',
+    label: 'Long-term',
+    body: 'Become the leading reference in design, technical modeling and specialized consulting for stainless steel and glass in Utah, and expand our logistics and supply network nationwide — reshaping how premium architectural projects are planned, sourced and executed.',
+    points: ['Statewide reference in Utah', 'Nationwide expansion', 'Flawless execution'],
+  },
+];
+---
+
+<section class="relative bg-ink text-warm-gray py-24 sm:py-32">
+  <div class="mx-auto max-w-7xl px-5 sm:px-8">
+    <div class="max-w-2xl mb-16" data-reveal>
+      <p class="eyebrow text-light-teal mb-6 flex items-center gap-3">
+        <span class="inline-block w-9 h-px bg-sand rule-draw"></span>
+        Vision
+      </p>
+      <h2 class="font-display font-semibold text-4xl sm:text-5xl leading-[1.1] text-warm-gray">
+        Where we're building
+      </h2>
+    </div>
+
+    <div class="grid lg:grid-cols-12 gap-8 lg:gap-10 items-stretch">
+      <!-- image -->
+      <div class="lg:col-span-4" data-reveal>
+        <div class="tick-frame p-3 h-full">
+          <div class="relative overflow-hidden h-full min-h-72">
+            <img
+              src="/images/arch/corridor.jpg"
+              alt="Receding arched corridor of pale architecture"
+              class="w-full h-full object-cover duotone"
+              loading="lazy"
+              width="1000"
+              height="1200"
+            />
+            <div class="absolute inset-0 bg-deep-teal/30 mix-blend-multiply"></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- horizon cards -->
+      <div class="lg:col-span-8 grid sm:grid-cols-2 gap-px bg-white/8 border border-white/8">
+        {horizons.map((h, i) => (
+          <article
+            class="relative bg-ink p-8 sm:p-9"
+            data-reveal
+            style={`--reveal-delay:${i * 140}ms`}
+          >
+            <div class="flex items-baseline gap-4">
+              <span class="font-display text-sand text-2xl font-semibold">0{i + 1}</span>
+              <div>
+                <p class="text-[0.68rem] tracking-[0.28em] uppercase text-light-teal/70">{h.tag}</p>
+                <h3 class="font-display text-2xl font-semibold text-warm-gray tracking-wide">{h.label}</h3>
+              </div>
+            </div>
+
+            <div class="mt-6 h-px w-full bg-gradient-to-r from-sand/50 to-transparent"></div>
+
+            <p class="mt-6 text-base leading-relaxed text-warm-gray/65">{h.body}</p>
+
+            <ul class="mt-7 space-y-3">
+              {h.points.map((p) => (
+                <li class="flex items-center gap-3 text-sm text-warm-gray/85">
+                  <span class="inline-block w-1.5 h-1.5 rotate-45 bg-sand shrink-0"></span>
+                  {p}
+                </li>
+              ))}
+            </ul>
+          </article>
+        ))}
+      </div>
+    </div>
+  </div>
+</section>

@@ -1,0 +1,7 @@
+{
+  "$schema": "node_modules/wrangler/config-schema.json",
+  "name": "vetro-steel",
+  "compatibility_date": "2025-01-01",
+  // Astro's static build output. `wrangler pages deploy` uploads this folder.
+  "pages_build_output_dir": "./dist"
+}

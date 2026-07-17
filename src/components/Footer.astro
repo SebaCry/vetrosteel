@@ -1,0 +1,52 @@
+---
+import Logo from './Logo.astro';
+
+const year = new Date().getFullYear();
+const nav = [
+  { label: 'About', href: '#about' },
+  { label: 'Services', href: '#services' },
+  { label: 'Work', href: '#work' },
+  { label: 'Values', href: '#values' },
+  { label: 'Team', href: '#team' },
+  { label: 'Contact', href: '#contact' },
+];
+---
+
+<footer class="bg-ink border-t border-white/8 text-warm-gray/70">
+  <div class="mx-auto max-w-7xl px-5 sm:px-8 py-14">
+    <div class="grid gap-10 md:grid-cols-12 md:gap-8">
+      <div class="md:col-span-5">
+        <Logo variant="full" tone="light" />
+        <p class="mt-6 max-w-sm text-sm leading-relaxed text-warm-gray/55">
+          Design, technical modeling and specialized consulting in stainless
+          steel and glass. Consulting · Development · Innovation.
+        </p>
+      </div>
+
+      <nav class="md:col-span-4">
+        <p class="text-[0.68rem] tracking-[0.28em] uppercase text-sand/80 mb-5">Navigation</p>
+        <ul class="grid grid-cols-2 gap-3 text-sm">
+          {nav.map((l) => (
+            <li>
+              <a href={l.href} class="hover:text-sand transition-colors">{l.label}</a>
+            </li>
+          ))}
+        </ul>
+      </nav>
+
+      <div class="md:col-span-3">
+        <p class="text-[0.68rem] tracking-[0.28em] uppercase text-sand/80 mb-5">Contact</p>
+        <ul class="space-y-3 text-sm">
+          <li><a href="mailto:info@vetrosteel.com" class="hover:text-sand transition-colors">info@vetrosteel.com</a></li>
+          <li>Utah, United States</li>
+          <li class="text-warm-gray/45">Consulting · Development · Innovation</li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="mt-14 pt-8 border-t border-white/8 flex flex-col sm:flex-row items-center justify-between gap-4 text-xs text-warm-gray/40 tracking-wide">
+      <p>© {year} Vetro Steel Design Studio LLC. All rights reserved.</p>
+      <p class="tracking-[0.2em] uppercase">Precision · Strength · Elegance</p>
+    </div>
+  </div>
+</footer>

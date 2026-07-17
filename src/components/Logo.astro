@@ -1,0 +1,63 @@
+---
+/**
+ * Vetro Steel logo lockup.
+ * variant: "full" (mark + wordmark) | "mark" (monogram only)
+ * tone: "light" (for dark backgrounds) | "dark" (for light backgrounds)
+ */
+interface Props {
+  variant?: 'full' | 'mark';
+  tone?: 'light' | 'dark';
+  class?: string;
+}
+const { variant = 'full', tone = 'light', class: className = '' } = Astro.props;
+
+const vColor = tone === 'light' ? '#e8e6e3' : '#0f3b46';
+const subColor = tone === 'light' ? '#8daeb3' : '#2b5d66';
+const wordColor = tone === 'light' ? '#f5f3ef' : '#0f3b46';
+---
+
+<div class={`flex items-center gap-3 ${className}`}>
+  <svg
+    class="shrink-0"
+    width="44"
+    height="44"
+    viewBox="0 0 100 100"
+    fill="none"
+    role="img"
+    aria-label="Vetro Steel monogram"
+  >
+    <!-- V — sharp, filled chevron -->
+    <path
+      d="M10 16 L27 16 L50 71 L73 16 L90 16 L57 94 L43 94 Z"
+      fill={vColor}
+    />
+    <!-- S — flowing sand ribbon interlocking the V -->
+    <path
+      d="M82 30
+         C82 20 66 18 60 27
+         C54 36 74 43 76 54
+         C78 66 60 70 52 60"
+      stroke="#c8b28a"
+      stroke-width="10"
+      stroke-linecap="round"
+      fill="none"
+    />
+  </svg>
+
+  {variant === 'full' && (
+    <span class="flex flex-col leading-none">
+      <span
+        class="font-display font-semibold text-[1.05rem] tracking-[0.18em]"
+        style={`color:${wordColor}`}
+      >
+        VETRO STEEL
+      </span>
+      <span
+        class="mt-1 text-[0.55rem] tracking-[0.42em] font-medium uppercase"
+        style={`color:${subColor}`}
+      >
+        Studio — Design
+      </span>
+    </span>
+  )}
+</div>

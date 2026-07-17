@@ -1,0 +1,26 @@
+{
+  "name": "vetro-steel",
+  "type": "module",
+  "version": "1.0.0",
+  "private": true,
+  "scripts": {
+    "dev": "astro dev",
+    "start": "astro dev",
+    "build": "astro build",
+    "preview": "astro preview",
+    "astro": "astro"
+  },
+  "dependencies": {
+    "@astrojs/sitemap": "^3.7.3",
+    "@fontsource-variable/montserrat": "^5.2.8",
+    "@fontsource/cinzel": "^5.2.8",
+    "@iconify-json/lucide": "^1.2.117",
+    "@tailwindcss/vite": "^4.3.3",
+    "astro": "^7.1.0",
+    "astro-icon": "^1.1.5",
+    "tailwindcss": "^4.3.3"
+  },
+  "devDependencies": {
+    "playwright": "^1.61.1"
+  }
+}

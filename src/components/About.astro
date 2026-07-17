@@ -1,0 +1,68 @@
+---
+import { Icon } from 'astro-icon/components';
+
+const attributes = [
+  { icon: 'lucide:pen-tool', title: 'Modern', sub: 'Clean & bold' },
+  { icon: 'lucide:building-2', title: 'Architectural', sub: 'Strong & stable' },
+  { icon: 'lucide:gem', title: 'Sophisticated', sub: 'Premium feel' },
+  { icon: 'lucide:scan-line', title: 'Detail-Oriented', sub: 'Design focused' },
+];
+---
+
+<section id="about" class="relative bg-paper text-ink py-24 sm:py-32">
+  <div class="mx-auto max-w-7xl px-5 sm:px-8">
+    <div class="grid lg:grid-cols-12 gap-12 lg:gap-16 items-center">
+      <div class="lg:col-span-6" data-reveal>
+        <p class="eyebrow text-teal mb-6 flex items-center gap-3">
+          <span class="inline-block w-9 h-px bg-sand rule-draw"></span>
+          About us
+        </p>
+        <h2 class="font-display font-semibold text-4xl sm:text-5xl leading-[1.1] text-deep-teal">
+          From concept<br class="hidden sm:block" /> to structure
+        </h2>
+        <p class="mt-8 text-lg sm:text-xl leading-relaxed text-ink/80">
+          <span class="text-deep-teal font-semibold">Vetro Steel Design</span> is a
+          studio specialized in industrial design, modeling and architectural
+          solutions in stainless steel and glass.
+        </p>
+        <p class="mt-6 text-base sm:text-lg leading-relaxed text-ink/65">
+          We help contractors, architects and design firms turn concepts into
+          projects ready for fabrication and installation — combining technical
+          precision, expert guidance and the strategic supply of premium
+          components to deliver efficient, high-end results.
+        </p>
+      </div>
+
+      <div class="lg:col-span-6" data-reveal style="--reveal-delay:150ms">
+        <div class="tick-frame p-3">
+          <div class="relative overflow-hidden aspect-[4/5] sm:aspect-[5/4]">
+            <img
+              src="/images/arch/tower-1.jpg"
+              alt="Stainless steel and glass towers rising into fog"
+              class="w-full h-full object-cover duotone"
+              loading="lazy"
+              width="1200"
+              height="800"
+            />
+            <div class="absolute inset-0 bg-deep-teal/25 mix-blend-multiply"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Brand attributes -->
+    <div class="mt-16 sm:mt-20 grid grid-cols-2 lg:grid-cols-4 gap-px bg-deep-teal/10 border border-deep-teal/10">
+      {attributes.map((a, i) => (
+        <div
+          class="bg-paper p-7 sm:p-8 group hover:bg-white transition-colors duration-300"
+          data-reveal
+          style={`--reveal-delay:${i * 90}ms`}
+        >
+          <Icon name={a.icon} class="w-7 h-7 text-sand" />
+          <h3 class="mt-5 font-display text-lg font-semibold text-deep-teal tracking-wide">{a.title}</h3>
+          <p class="mt-1 text-sm text-ink/55">{a.sub}</p>
+        </div>
+      ))}
+    </div>
+  </div>
+</section>
