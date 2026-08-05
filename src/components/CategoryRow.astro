@@ -1,0 +1,46 @@
+---
+import Figure from './ui/Figure.astro';
+import SectionHeader from './ui/SectionHeader.astro';
+import type { CategoryItem } from '../data/verticals';
+
+interface Props {
+  eyebrow: string;
+  title: string;
+  lead?: string;
+  items: CategoryItem[];
+}
+const { eyebrow, title, lead, items } = Astro.props;
+---
+
+<section class="relative bg-paper text-ink py-24 sm:py-32">
+  <div class="mx-auto max-w-7xl px-5 sm:px-8">
+    <SectionHeader eyebrow={eyebrow} title={title} lead={lead} tone="light" class="mb-16" />
+
+    <div class="grid md:grid-cols-3 gap-8 lg:gap-10">
+      {
+        items.map((item, i) => (
+          <article class="group" data-reveal style={`--reveal-delay:${i * 110}ms`}>
+            <div class="tick-frame p-2.5">
+              <Figure
+                src={item.image}
+                alt={item.title}
+                ratio="aspect-[4/3]"
+                sizes="(min-width:768px) 31vw, 92vw"
+                widths={[420, 700, 1000]}
+                duotone
+                imgClass="transition-transform duration-[1100ms] ease-[cubic-bezier(0.16,1,0.3,1)] group-hover:scale-[1.05]"
+              >
+                <div class="absolute inset-0 bg-deep-teal/20 mix-blend-multiply" />
+              </Figure>
+            </div>
+            <h3 class="mt-7 font-display text-xl font-semibold text-deep-teal tracking-wide">
+              {item.title}
+            </h3>
+            <span class="mt-3 block w-9 h-px bg-sand transition-all duration-500 group-hover:w-16" />
+            <p class="mt-4 text-sm sm:text-base leading-relaxed text-ink/65">{item.body}</p>
+          </article>
+        ))
+      }
+    </div>
+  </div>
+</section>

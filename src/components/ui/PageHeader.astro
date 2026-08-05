@@ -1,0 +1,51 @@
+---
+interface Props {
+  eyebrow: string;
+  title: string;
+  lead?: string;
+  crumb: string;
+}
+const { eyebrow, title, lead, crumb } = Astro.props;
+---
+
+<section class="relative bg-ink text-warm-gray overflow-hidden pt-36 sm:pt-44 pb-16 sm:pb-20">
+  <div class="absolute inset-0 blueprint-grid opacity-40"></div>
+  <div
+    class="absolute inset-0"
+    style="background:radial-gradient(90% 80% at 20% 0%, rgba(26,85,99,0.55) 0%, rgba(7,30,36,0) 62%);"
+  >
+  </div>
+
+  <div class="relative mx-auto max-w-7xl px-5 sm:px-8">
+    <nav aria-label="Breadcrumb" class="mb-8" data-reveal>
+      <ol class="flex items-center gap-2 text-[0.7rem] uppercase tracking-[0.2em] text-warm-gray/45">
+        <li><a href="/" class="hover:text-sand transition-colors">Home</a></li>
+        <li aria-hidden="true">/</li>
+        <li class="text-sand/90">{crumb}</li>
+      </ol>
+    </nav>
+
+    <p class="eyebrow text-sand mb-6 flex items-center gap-3" data-reveal style="--reveal-delay:60ms">
+      <span class="inline-block w-9 h-px bg-sand rule-draw"></span>
+      {eyebrow}
+    </p>
+    <h1
+      class="font-display font-semibold text-4xl sm:text-5xl lg:text-6xl leading-[1.08] text-warm-gray max-w-3xl"
+      data-reveal
+      style="--reveal-delay:120ms"
+    >
+      {title}
+    </h1>
+    {
+      lead && (
+        <p
+          class="mt-7 max-w-xl text-base sm:text-lg leading-relaxed text-warm-gray/70"
+          data-reveal
+          style="--reveal-delay:220ms"
+        >
+          {lead}
+        </p>
+      )
+    }
+  </div>
+</section>

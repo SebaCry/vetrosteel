@@ -1,0 +1,47 @@
+---
+/**
+ * The eyebrow + rule + headline block that opens every section.
+ * `tone` switches the palette for sections sitting on paper vs. ink.
+ */
+interface Props {
+  eyebrow: string;
+  title: string;
+  lead?: string;
+  tone?: 'light' | 'dark';
+  align?: 'split' | 'left' | 'center';
+  class?: string;
+}
+
+const { eyebrow, title, lead, tone = 'dark', align = 'split', class: className = '' } = Astro.props;
+
+const eyebrowTone = tone === 'dark' ? 'text-sand' : 'text-teal';
+const titleTone = tone === 'dark' ? 'text-warm-gray' : 'text-deep-teal';
+const leadTone = tone === 'dark' ? 'text-warm-gray/60' : 'text-ink/60';
+
+const wrap =
+  align === 'split'
+    ? 'flex flex-col md:flex-row md:items-end md:justify-between gap-6'
+    : align === 'center'
+      ? 'flex flex-col items-center text-center'
+      : 'flex flex-col';
+---
+
+<div class={`${wrap} ${className}`} data-reveal>
+  <div class={align === 'center' ? 'max-w-2xl' : 'max-w-xl'}>
+    <p class={`eyebrow ${eyebrowTone} mb-6 flex items-center gap-3 ${align === 'center' ? 'justify-center' : ''}`}>
+      <span class="inline-block w-9 h-px bg-sand rule-draw"></span>
+      {eyebrow}
+      {align === 'center' && <span class="inline-block w-9 h-px bg-sand"></span>}
+    </p>
+    <h2 class={`font-display font-semibold text-4xl sm:text-5xl leading-[1.1] text-balance ${titleTone}`}>
+      {title}
+    </h2>
+  </div>
+  {
+    lead && (
+      <p class={`max-w-sm text-base leading-relaxed ${leadTone} ${align === 'center' ? 'mt-6' : ''}`}>
+        {lead}
+      </p>
+    )
+  }
+</div>

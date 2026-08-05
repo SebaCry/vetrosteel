@@ -2,27 +2,51 @@
 import Layout from '../layouts/Layout.astro';
 import Nav from '../components/Nav.astro';
 import Hero from '../components/Hero.astro';
+import VerticalSplit from '../components/VerticalSplit.astro';
 import About from '../components/About.astro';
-import Mission from '../components/Mission.astro';
-import Vision from '../components/Vision.astro';
-import Values from '../components/Values.astro';
 import Services from '../components/Services.astro';
-import Gallery from '../components/Gallery.astro';
-import Contact from '../components/Contact.astro';
+import ProjectGallery from '../components/ProjectGallery.astro';
+import ValuesStrip from '../components/ValuesStrip.astro';
+import TaglineMarquee from '../components/TaglineMarquee.astro';
+import CTABand from '../components/ui/CTABand.astro';
 import Footer from '../components/Footer.astro';
+import { commercial, residential } from '../data/verticals';
+
+/**
+ * Home is the fork, not the whole story: hero, the two verticals, who we are,
+ * what backs the work, a sample of it, and one way to start a conversation.
+ * Mission / Vision / Values now live on /about.
+ */
+const featured = [
+  commercial.gallery[0],
+  residential.gallery[0],
+  commercial.gallery[4],
+  residential.gallery[1],
+  commercial.gallery[1],
+  residential.gallery[2],
+];
 ---
 
 <Layout>
   <Nav />
-  <main>
+  <main id="main">
     <Hero />
-    <About />
-    <Mission />
-    <Vision />
-    <Services />
-    <Gallery />
-    <Values />
-    <Contact />
+    <VerticalSplit />
+    <About compact />
+    <Services limit={3} more />
+    <ProjectGallery
+      eyebrow="Our craft"
+      title="Built for visionary projects"
+      lead="Tempered glass and stainless steel, engineered to fit and built to last — across both lines of work."
+      items={featured}
+      gaps={[commercial.gaps[0]]}
+    />
+    <ValuesStrip />
+    <TaglineMarquee />
+    <CTABand
+      headline="Let's build something made to last"
+      body="Tell us about the project — commercial or residential — and we'll come back with a system, a drawing and a number."
+    />
   </main>
   <Footer />
 </Layout>

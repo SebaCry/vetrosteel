@@ -1,4 +1,7 @@
 ---
+import { Image } from 'astro:assets';
+import { asset } from '../lib/images';
+
 const horizons = [
   {
     tag: 'Near term',
@@ -32,13 +35,14 @@ const horizons = [
       <div class="lg:col-span-4" data-reveal>
         <div class="tick-frame p-3 h-full">
           <div class="relative overflow-hidden h-full min-h-72">
-            <img
-              src="/images/arch/corridor.jpg"
-              alt="Receding arched corridor of pale architecture"
-              class="w-full h-full object-cover duotone"
+            <Image
+              src={asset('scenes/office-glass-doors.jpg')}
+              alt="Glazed office partition with framed door leaves"
+              widths={[500, 800, 1100]}
+              sizes="(min-width:1024px) 30vw, 92vw"
               loading="lazy"
-              width="1000"
-              height="1200"
+              decoding="async"
+              class="w-full h-full object-cover duotone"
             />
             <div class="absolute inset-0 bg-deep-teal/30 mix-blend-multiply"></div>
           </div>

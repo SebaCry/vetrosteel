@@ -1,7 +1,14 @@
 ---
 import { Icon } from 'astro-icon/components';
 
-const services = [
+interface Props {
+  /** Home shows a trimmed set; /about shows all of them. */
+  limit?: number;
+  more?: boolean;
+}
+const { limit, more = false } = Astro.props;
+
+const allServices = [
   { icon: 'lucide:drafting-compass', title: 'Technical Plans & Shop Drawings', body: 'Fabrication-ready shop documentation, with tolerances and details verified to install without surprises.' },
   { icon: 'lucide:layers', title: 'Stainless Steel & Glass Design', body: 'Development of parts and systems that balance aesthetics, structural strength and constructive efficiency.' },
   { icon: 'lucide:box', title: 'Architectural Modeling', body: 'Precise 3D models that anticipate clashes and communicate the project before anything is fabricated.' },
@@ -9,9 +16,11 @@ const services = [
   { icon: 'lucide:clipboard-check', title: 'Technical Consulting', body: 'Specialized guidance on materials, connections and feasibility for sound decisions from day one.' },
   { icon: 'lucide:truck', title: 'Strategic Supply Support', body: 'Sourcing of premium components through our partner network, optimizing both cost and lead time.' },
 ];
+
+const services = limit ? allServices.slice(0, limit) : allServices;
 ---
 
-<section id="services" class="relative bg-deep-teal text-warm-gray py-24 sm:py-32 overflow-hidden">
+<section id="capabilities" class="relative bg-deep-teal text-warm-gray py-24 sm:py-32 overflow-hidden">
   <div class="absolute inset-0 blueprint-grid opacity-30"></div>
 
   <div class="relative mx-auto max-w-7xl px-5 sm:px-8">
@@ -19,15 +28,15 @@ const services = [
       <div class="max-w-xl">
         <p class="eyebrow text-sand mb-6 flex items-center gap-3">
           <span class="inline-block w-9 h-px bg-sand rule-draw"></span>
-          Services
+          Capabilities
         </p>
-        <h2 class="font-display font-semibold text-4xl sm:text-5xl leading-[1.1] text-warm-gray">
+        <h2 class="font-display font-semibold text-4xl sm:text-5xl leading-[1.1] text-balance text-warm-gray">
           Technical precision, end to end
         </h2>
       </div>
       <p class="max-w-sm text-warm-gray/60 text-base leading-relaxed">
-        One partner to carry your project from the first concept to the
-        installed component.
+        Behind both lines of work sits the same studio: drawings, modeling and
+        coordination that make the install predictable.
       </p>
     </div>
 
@@ -49,5 +58,19 @@ const services = [
         </article>
       ))}
     </div>
+
+    {more && (
+      <div class="mt-12" data-reveal>
+        <a
+          href="/about#capabilities"
+          class="group inline-flex items-center gap-2.5 text-[0.78rem] font-semibold uppercase tracking-[0.18em] text-sand border-b border-sand/30 hover:border-sand pb-1 transition-colors duration-300"
+        >
+          All capabilities
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="transition-transform duration-300 group-hover:translate-x-1" aria-hidden="true">
+            <path d="M5 12h14M13 6l6 6-6 6" stroke-linecap="round" stroke-linejoin="round" />
+          </svg>
+        </a>
+      </div>
+    )}
   </div>
 </section>

@@ -1,0 +1,69 @@
+---
+import { site } from '../../data/site';
+
+interface Props {
+  headline: string;
+  body: string;
+  /** Pre-selects the vertical on the quote form. */
+  vertical?: 'commercial' | 'residential';
+  label?: string;
+}
+
+const { headline, body, vertical, label = 'Request a quote' } = Astro.props;
+const href = vertical ? `/quote?for=${vertical}` : '/quote';
+---
+
+<section class="relative bg-deep-teal text-warm-gray py-24 sm:py-28 overflow-hidden">
+  <div class="absolute inset-0 blueprint-grid opacity-30"></div>
+  <div
+    class="absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-sand/50 to-transparent"
+  >
+  </div>
+
+  <div class="relative mx-auto max-w-3xl px-5 sm:px-8 text-center">
+    <h2
+      class="font-display font-semibold text-3xl sm:text-5xl leading-[1.1] text-warm-gray"
+      data-reveal
+    >
+      {headline}
+    </h2>
+    <p
+      class="mt-7 text-base sm:text-lg leading-relaxed text-warm-gray/70"
+      data-reveal
+      style="--reveal-delay:120ms"
+    >
+      {body}
+    </p>
+
+    <div
+      class="mt-10 flex flex-col sm:flex-row items-center justify-center gap-4"
+      data-reveal
+      style="--reveal-delay:220ms"
+    >
+      <a
+        href={href}
+        class="group inline-flex items-center justify-center gap-2 bg-sand text-ink font-semibold uppercase tracking-[0.14em] text-[0.82rem] px-8 py-4 hover:bg-sand-bright transition-colors duration-300"
+      >
+        {label}
+        <svg
+          width="16"
+          height="16"
+          viewBox="0 0 24 24"
+          fill="none"
+          stroke="currentColor"
+          stroke-width="2"
+          class="transition-transform duration-300 group-hover:translate-x-1"
+          aria-hidden="true"
+        >
+          <path d="M5 12h14M13 6l6 6-6 6" stroke-linecap="round" stroke-linejoin="round"></path>
+        </svg>
+      </a>
+      <a
+        href={`mailto:${site.email}`}
+        class="text-warm-gray/75 tracking-[0.06em] hover:text-sand transition-colors border-b border-transparent hover:border-sand pb-0.5"
+      >
+        {site.email}
+      </a>
+    </div>
+  </div>
+</section>

@@ -1,0 +1,43 @@
+---
+import Layout from '../layouts/Layout.astro';
+import Nav from '../components/Nav.astro';
+import Footer from '../components/Footer.astro';
+import PageHeader from '../components/ui/PageHeader.astro';
+import About from '../components/About.astro';
+import Mission from '../components/Mission.astro';
+import Vision from '../components/Vision.astro';
+import Services from '../components/Services.astro';
+import Values from '../components/Values.astro';
+import CTABand from '../components/ui/CTABand.astro';
+import { site } from '../data/site';
+
+/**
+ * The studio story, moved off the home page in full: about, mission, vision,
+ * the complete capability set and the values cards.
+ */
+---
+
+<Layout
+  title={`About — ${site.legalName}`}
+  description="The studio behind Vetro Steel: mission, vision, capabilities and the values we hold every project to. Utah, USA."
+>
+  <Nav />
+  <main id="main">
+    <PageHeader
+      crumb="About"
+      eyebrow="About us"
+      title="From concept to structure"
+      lead="A studio specialized in industrial design, modeling and architectural solutions in stainless steel and glass — and the shop that installs them."
+    />
+    <About />
+    <Mission />
+    <Vision />
+    <Services />
+    <Values />
+    <CTABand
+      headline="Work with the studio"
+      body="Whether it starts as a drawing set or a photo of a bathroom, it ends the same way: measured, fabricated and installed."
+    />
+  </main>
+  <Footer />
+</Layout>

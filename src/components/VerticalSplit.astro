@@ -1,0 +1,82 @@
+---
+import Figure from './ui/Figure.astro';
+import { verticals } from '../data/verticals';
+
+/**
+ * The home page fork. Everything above this section is shared; everything
+ * below a panel belongs to one vertical.
+ */
+---
+
+<section id="verticals" class="relative bg-ink text-warm-gray">
+  <div class="mx-auto max-w-7xl px-5 sm:px-8 pt-24 sm:pt-28 pb-14">
+    <div class="max-w-2xl" data-reveal>
+      <p class="eyebrow text-sand mb-6 flex items-center gap-3">
+        <span class="inline-block w-9 h-px bg-sand rule-draw"></span>
+        Two lines of work
+      </p>
+      <h2 class="font-display font-semibold text-4xl sm:text-5xl leading-[1.1] text-warm-gray">
+        Where does your project sit?
+      </h2>
+      <p class="mt-7 text-base sm:text-lg leading-relaxed text-warm-gray/65">
+        The same hardware catalog and the same shop serve both — but the
+        drawings, the tolerances and the way we schedule the work are not the
+        same on a storefront as they are in a bathroom.
+      </p>
+    </div>
+  </div>
+
+  <div class="grid md:grid-cols-2 gap-px bg-white/10 border-y border-white/10">
+    {
+      verticals.map((v, i) => (
+        <a
+          href={`/${v.slug}`}
+          class="group relative block bg-ink overflow-hidden min-h-[26rem] sm:min-h-[34rem] lg:min-h-[40rem]"
+          data-reveal
+          style={`--reveal-delay:${i * 140}ms`}
+        >
+          <Figure
+            src={v.hero.image}
+            alt={v.hero.alt}
+            fill
+            sizes="(min-width:768px) 50vw, 100vw"
+            widths={[600, 900, 1400, 1900]}
+            duotone
+            class="transition-transform duration-[1200ms] ease-[cubic-bezier(0.16,1,0.3,1)] group-hover:scale-[1.04]"
+          />
+
+          <div class="absolute inset-0 bg-gradient-to-t from-ink via-ink/55 to-ink/15" />
+          <div class="absolute inset-0 ring-1 ring-inset ring-white/10" />
+
+          <div class="relative h-full flex flex-col justify-end p-8 sm:p-12">
+            <span class="eyebrow text-sand mb-5 flex items-center gap-3">
+              <span class="inline-block w-8 h-px bg-sand transition-all duration-500 group-hover:w-14" />
+              0{i + 1} · {v.eyebrow}
+            </span>
+            <h3 class="font-display font-semibold text-3xl sm:text-4xl lg:text-[2.75rem] leading-[1.12] text-warm-gray">
+              {v.headline}
+            </h3>
+            <p class="mt-5 max-w-md text-sm sm:text-base leading-relaxed text-warm-gray/70">
+              {v.lead}
+            </p>
+            <span class="mt-8 inline-flex items-center gap-2 text-[0.78rem] font-semibold uppercase tracking-[0.18em] text-sand">
+              Explore {v.nav.toLowerCase()}
+              <svg
+                width="16"
+                height="16"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="2"
+                class="transition-transform duration-500 group-hover:translate-x-1.5"
+                aria-hidden="true"
+              >
+                <path d="M5 12h14M13 6l6 6-6 6" stroke-linecap="round" stroke-linejoin="round" />
+              </svg>
+            </span>
+          </div>
+        </a>
+      ))
+    }
+  </div>
+</section>

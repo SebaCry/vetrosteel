@@ -1,0 +1,63 @@
+---
+import Figure from './ui/Figure.astro';
+import SectionHeader from './ui/SectionHeader.astro';
+import MaterialNote from './ui/MaterialNote.astro';
+import type { ProductItem } from '../data/verticals';
+
+interface Props {
+  eyebrow: string;
+  title: string;
+  lead?: string;
+  items: ProductItem[];
+  gap?: { where: string; needs: string };
+}
+const { eyebrow, title, lead, items, gap } = Astro.props;
+---
+
+<section id="hardware" class="relative bg-deep-teal text-warm-gray py-24 sm:py-32 overflow-hidden">
+  <div class="absolute inset-0 blueprint-grid opacity-30"></div>
+
+  <div class="relative mx-auto max-w-7xl px-5 sm:px-8">
+    <SectionHeader eyebrow={eyebrow} title={title} lead={lead} tone="dark" class="mb-14" />
+
+    {gap && <MaterialNote where={gap.where} needs={gap.needs} />}
+
+    <div class="grid grid-cols-2 lg:grid-cols-4 gap-px bg-white/10 border border-white/10">
+      {
+        items.map((p, i) => (
+          <article
+            class="relative bg-deep-teal group hover:bg-teal transition-colors duration-500"
+            data-reveal
+            style={`--reveal-delay:${(i % 4) * 90}ms`}
+          >
+            <Figure
+              src={p.image}
+              alt={p.name}
+              ratio="aspect-square"
+              sizes="(min-width:1024px) 24vw, 46vw"
+              widths={[300, 500, 800]}
+              fit="contain"
+              class="bg-warm-gray/95"
+              imgClass="p-4 sm:p-6 transition-transform duration-[900ms] ease-[cubic-bezier(0.16,1,0.3,1)] group-hover:scale-[1.06]"
+            />
+            <div class="p-5 sm:p-6">
+              <h3 class="font-display text-base sm:text-lg font-semibold text-warm-gray leading-snug tracking-wide">
+                {p.name}
+              </h3>
+              <p class="mt-2.5 text-[0.8rem] sm:text-sm leading-relaxed text-warm-gray/60">{p.note}</p>
+              {p.finishes && (
+                <ul class="mt-4 flex flex-wrap gap-1.5">
+                  {p.finishes.map((f) => (
+                    <li class="border border-sand/30 px-2 py-1 text-[0.62rem] uppercase tracking-[0.14em] text-sand/80">
+                      {f}
+                    </li>
+                  ))}
+                </ul>
+              )}
+            </div>
+          </article>
+        ))
+      }
+    </div>
+  </div>
+</section>

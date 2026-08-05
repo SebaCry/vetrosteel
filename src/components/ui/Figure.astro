@@ -1,0 +1,69 @@
+---
+import { Image } from 'astro:assets';
+import { asset } from '../../lib/images';
+
+/**
+ * The single place imagery is rendered. Everything goes through astro:assets,
+ * so every photo ships as AVIF/WebP with a responsive srcset.
+ *
+ * `parallax` opts a figure into the discreet scroll translation wired up in
+ * Layout.astro — it is ignored under prefers-reduced-motion.
+ */
+interface Props {
+  src: string;
+  alt: string;
+  /** Absolutely fill the nearest positioned ancestor instead of holding a ratio. */
+  fill?: boolean;
+  ratio?: string;
+  sizes?: string;
+  widths?: number[];
+  eager?: boolean;
+  duotone?: boolean;
+  parallax?: boolean;
+  fit?: 'cover' | 'contain';
+  class?: string;
+  imgClass?: string;
+}
+
+const {
+  src,
+  alt,
+  fill = false,
+  ratio = 'aspect-[4/5]',
+  sizes = '(min-width:1280px) 30vw, (min-width:768px) 45vw, 92vw',
+  widths = [400, 700, 1000, 1400],
+  eager = false,
+  duotone = false,
+  parallax = false,
+  fit = 'cover',
+  class: className = '',
+  imgClass = '',
+} = Astro.props;
+
+// Written out in full so Tailwind's scanner sees the literal class names.
+const fitClass = fit === 'contain' ? 'object-contain' : 'object-cover';
+// `relative` and `absolute` are the same Tailwind layer — emitting both lets
+// stylesheet order decide, so pick exactly one.
+const boxClass = fill ? 'absolute inset-0' : `relative ${ratio}`;
+
+const image = asset(src);
+const maxWidth = image.width;
+const safeWidths = [...new Set(widths.filter((w) => w <= maxWidth).concat(Math.min(maxWidth, widths.at(-1)!)))].sort(
+  (a, b) => a - b
+);
+---
+
+<div class={`${boxClass} overflow-hidden ${className}`}>
+  <Image
+    src={image}
+    alt={alt}
+    widths={safeWidths}
+    sizes={sizes}
+    loading={eager ? 'eager' : 'lazy'}
+    decoding={eager ? 'sync' : 'async'}
+    fetchpriority={eager ? 'high' : 'auto'}
+    data-parallax={parallax ? '' : undefined}
+    class={`w-full h-full ${fitClass} ${duotone ? 'duotone' : ''} ${parallax ? 'parallax-img' : ''} ${imgClass}`}
+  />
+  <slot />
+</div>

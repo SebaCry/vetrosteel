@@ -1,0 +1,379 @@
+---
+import { verticals } from '../data/verticals';
+import { site } from '../data/site';
+
+/**
+ * Quote request form. Validates in the browser, posts JSON to the Pages
+ * Function at /api/quote, and drives four visible states: idle, submitting,
+ * success and error. The server re-validates — the client checks are a
+ * courtesy, not a gate.
+ */
+const projectTypes = [
+  'Shower enclosure',
+  'Sliding shower system',
+  'Glass railing / guardrail',
+  'Office partition',
+  'Entrance / storefront',
+  'Hardware supply only',
+  'Something else',
+];
+---
+
+<div class="mx-auto max-w-3xl">
+  <form id="quote-form" novalidate class="relative" data-state="idle">
+    <!-- Honeypot: hidden from people, tempting to bots. -->
+    <div class="absolute -left-[9999px]" aria-hidden="true">
+      <label>
+        Company website
+        <input type="text" name="website" tabindex="-1" autocomplete="off" />
+      </label>
+    </div>
+
+    <div class="grid sm:grid-cols-2 gap-x-6 gap-y-7">
+      <div class="sm:col-span-1">
+        <label class="quote-label" for="q-name">Name <span class="text-sand">*</span></label>
+        <input
+          class="quote-input"
+          id="q-name"
+          name="name"
+          type="text"
+          autocomplete="name"
+          required
+          aria-describedby="err-name"
+        />
+        <p class="quote-error" id="err-name" data-error-for="name" hidden></p>
+      </div>
+
+      <div class="sm:col-span-1">
+        <label class="quote-label" for="q-email">Email <span class="text-sand">*</span></label>
+        <input
+          class="quote-input"
+          id="q-email"
+          name="email"
+          type="email"
+          autocomplete="email"
+          required
+          aria-describedby="err-email"
+        />
+        <p class="quote-error" id="err-email" data-error-for="email" hidden></p>
+      </div>
+
+      <div class="sm:col-span-1">
+        <label class="quote-label" for="q-phone">Phone</label>
+        <input class="quote-input" id="q-phone" name="phone" type="tel" autocomplete="tel" />
+      </div>
+
+      <div class="sm:col-span-1">
+        <label class="quote-label" for="q-city">City / ZIP</label>
+        <input class="quote-input" id="q-city" name="city" type="text" autocomplete="address-level2" />
+      </div>
+
+      <div class="sm:col-span-1">
+        <label class="quote-label" for="q-vertical">Line of work <span class="text-sand">*</span></label>
+        <div class="quote-select-wrap">
+          <select class="quote-input" id="q-vertical" name="vertical" required aria-describedby="err-vertical">
+            <option value="">Select…</option>
+            {verticals.map((v) => <option value={v.slug}>{v.nav}</option>)}
+          </select>
+        </div>
+        <p class="quote-error" id="err-vertical" data-error-for="vertical" hidden></p>
+      </div>
+
+      <div class="sm:col-span-1">
+        <label class="quote-label" for="q-type">Project type</label>
+        <div class="quote-select-wrap">
+          <select class="quote-input" id="q-type" name="projectType">
+            <option value="">Select…</option>
+            {projectTypes.map((t) => <option value={t}>{t}</option>)}
+          </select>
+        </div>
+      </div>
+
+      <div class="sm:col-span-2">
+        <label class="quote-label" for="q-message">
+          Tell us about the project <span class="text-sand">*</span>
+        </label>
+        <textarea
+          class="quote-input min-h-36 resize-y"
+          id="q-message"
+          name="message"
+          rows="5"
+          required
+          aria-describedby="err-message hint-message"
+        ></textarea>
+        <p id="hint-message" class="mt-2 text-[0.78rem] text-warm-gray/45">
+          Rough dimensions, finish preference and a target date are enough to price it.
+        </p>
+        <p class="quote-error" id="err-message" data-error-for="message" hidden></p>
+      </div>
+    </div>
+
+    <div class="mt-9 flex flex-col sm:flex-row sm:items-center gap-5">
+      <button type="submit" class="quote-submit group" data-submit>
+        <span data-label-idle class="inline-flex items-center gap-2">
+          Send request
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="transition-transform duration-300 group-hover:translate-x-1" aria-hidden="true">
+            <path d="M5 12h14M13 6l6 6-6 6" stroke-linecap="round" stroke-linejoin="round"></path>
+          </svg>
+        </span>
+        <span data-label-busy class="inline-flex items-center gap-2.5" hidden>
+          <span class="spinner" aria-hidden="true"></span>
+          Sending…
+        </span>
+      </button>
+
+      <p class="text-[0.78rem] leading-relaxed text-warm-gray/45">
+        {'Or email us directly at '}
+        <a href={`mailto:${site.email}`} class="text-sand hover:underline">{site.email}</a>
+      </p>
+    </div>
+
+    <!-- Live region: one node, so a screen reader announces state changes once. -->
+    <div aria-live="polite" class="mt-7">
+      <div data-feedback="success" hidden class="border-l-2 border-sand bg-sand/8 px-5 py-4">
+        <p class="font-display text-lg font-semibold text-sand">Request received</p>
+        <p class="mt-1.5 text-sm leading-relaxed text-warm-gray/70" data-success-body>
+          We'll come back to you within one business day.
+        </p>
+      </div>
+      <div data-feedback="error" hidden class="border-l-2 border-red-400 bg-red-400/8 px-5 py-4">
+        <p class="font-display text-lg font-semibold text-red-300">That didn't send</p>
+        <p class="mt-1.5 text-sm leading-relaxed text-warm-gray/70" data-error-body></p>
+      </div>
+    </div>
+  </form>
+</div>
+
+<style>
+  .quote-label {
+    display: block;
+    font-size: 0.68rem;
+    text-transform: uppercase;
+    letter-spacing: 0.2em;
+    font-weight: 600;
+    color: color-mix(in srgb, var(--color-warm-gray) 62%, transparent);
+    margin-bottom: 0.7rem;
+  }
+
+  .quote-input {
+    width: 100%;
+    background-color: transparent;
+    border: 1px solid color-mix(in srgb, var(--color-light-teal) 26%, transparent);
+    color: var(--color-warm-gray);
+    padding: 0.85rem 1rem;
+    font-family: var(--font-body);
+    font-size: 0.95rem;
+    transition: border-color 0.3s, background-color 0.3s;
+  }
+  .quote-input::placeholder {
+    color: color-mix(in srgb, var(--color-warm-gray) 35%, transparent);
+  }
+  .quote-input:hover {
+    border-color: color-mix(in srgb, var(--color-light-teal) 45%, transparent);
+  }
+  .quote-input:focus {
+    outline: none;
+    border-color: var(--color-sand);
+    background-color: rgba(255, 255, 255, 0.03);
+  }
+  .quote-input[aria-invalid='true'] {
+    border-color: #f87171;
+  }
+
+  /* Native select needs an explicit dark palette or the popup renders white-on-white. */
+  select.quote-input {
+    appearance: none;
+    padding-right: 2.75rem;
+    cursor: pointer;
+  }
+  select.quote-input option {
+    background-color: var(--color-ink);
+    color: var(--color-warm-gray);
+  }
+  .quote-select-wrap {
+    position: relative;
+  }
+  .quote-select-wrap::after {
+    content: '';
+    position: absolute;
+    right: 1.05rem;
+    top: 50%;
+    width: 0.5rem;
+    height: 0.5rem;
+    border-right: 1.5px solid var(--color-sand);
+    border-bottom: 1.5px solid var(--color-sand);
+    transform: translateY(-70%) rotate(45deg);
+    pointer-events: none;
+  }
+
+  .quote-error {
+    margin-top: 0.55rem;
+    font-size: 0.78rem;
+    color: #fca5a5;
+  }
+
+  .quote-submit {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    background-color: var(--color-sand);
+    color: var(--color-ink);
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.14em;
+    font-size: 0.82rem;
+    padding: 1rem 2rem;
+    transition: background-color 0.3s, opacity 0.3s;
+  }
+  .quote-submit:hover:not(:disabled) {
+    background-color: var(--color-sand-bright);
+  }
+  .quote-submit:disabled {
+    opacity: 0.65;
+    cursor: progress;
+  }
+
+  .spinner {
+    width: 0.95rem;
+    height: 0.95rem;
+    border: 2px solid color-mix(in srgb, var(--color-ink) 30%, transparent);
+    border-top-color: var(--color-ink);
+    border-radius: 50%;
+    animation: spin 0.7s linear infinite;
+  }
+  @keyframes spin {
+    to {
+      transform: rotate(360deg);
+    }
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .spinner {
+      animation-duration: 2s;
+    }
+  }
+
+  form[data-state='success'] .grid,
+  form[data-state='success'] .mt-9 {
+    opacity: 0.4;
+    pointer-events: none;
+    transition: opacity 0.5s;
+  }
+</style>
+
+<script>
+  const form = document.getElementById('quote-form') as HTMLFormElement | null;
+  if (form) {
+    const submit = form.querySelector<HTMLButtonElement>('[data-submit]')!;
+    const idleLabel = form.querySelector<HTMLElement>('[data-label-idle]')!;
+    const busyLabel = form.querySelector<HTMLElement>('[data-label-busy]')!;
+    const okBox = form.querySelector<HTMLElement>('[data-feedback="success"]')!;
+    const errBox = form.querySelector<HTMLElement>('[data-feedback="error"]')!;
+    const errBody = form.querySelector<HTMLElement>('[data-error-body]')!;
+
+    // Deep link from the vertical CTAs: /quote?for=commercial
+    const wanted = new URLSearchParams(location.search).get('for');
+    const verticalField = form.elements.namedItem('vertical') as HTMLSelectElement | null;
+    if (wanted && verticalField && [...verticalField.options].some((o) => o.value === wanted)) {
+      verticalField.value = wanted;
+    }
+
+    const EMAIL = /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/;
+
+    const rules: Record<string, (v: string) => string | null> = {
+      name: (v) => (v.trim().length < 2 ? 'Please tell us your name.' : null),
+      email: (v) => (!EMAIL.test(v.trim()) ? 'That email address does not look right.' : null),
+      vertical: (v) => (!v ? 'Pick the line of work this falls under.' : null),
+      message: (v) =>
+        v.trim().length < 15 ? 'A sentence or two about the project, so we can price it.' : null,
+    };
+
+    const showError = (field: string, msg: string | null) => {
+      const input = form.elements.namedItem(field) as HTMLElement | null;
+      const slot = form.querySelector<HTMLElement>(`[data-error-for="${field}"]`);
+      if (!slot || !input) return;
+      slot.textContent = msg ?? '';
+      slot.hidden = !msg;
+      input.setAttribute('aria-invalid', msg ? 'true' : 'false');
+    };
+
+    const validateField = (field: string) => {
+      const el = form.elements.namedItem(field) as HTMLInputElement | null;
+      if (!el) return true;
+      const msg = rules[field](el.value);
+      showError(field, msg);
+      return !msg;
+    };
+
+    // Validate on blur, then live once a field has already been flagged.
+    Object.keys(rules).forEach((field) => {
+      const el = form.elements.namedItem(field) as HTMLElement | null;
+      el?.addEventListener('blur', () => validateField(field));
+      el?.addEventListener('input', () => {
+        if (el.getAttribute('aria-invalid') === 'true') validateField(field);
+      });
+      el?.addEventListener('change', () => {
+        if (el.getAttribute('aria-invalid') === 'true') validateField(field);
+      });
+    });
+
+    const setState = (state: 'idle' | 'submitting' | 'success' | 'error') => {
+      form.dataset.state = state;
+      const busy = state === 'submitting';
+      submit.disabled = busy;
+      idleLabel.hidden = busy;
+      busyLabel.hidden = !busy;
+      okBox.hidden = state !== 'success';
+      errBox.hidden = state !== 'error';
+    };
+
+    form.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      if (form.dataset.state === 'submitting') return;
+
+      const failed = Object.keys(rules).filter((f) => !validateField(f));
+      if (failed.length) {
+        const first = form.elements.namedItem(failed[0]) as HTMLElement | null;
+        first?.focus();
+        first?.scrollIntoView({ block: 'center', behavior: 'smooth' });
+        return;
+      }
+
+      setState('submitting');
+      const payload = Object.fromEntries(new FormData(form).entries());
+
+      try {
+        const res = await fetch('/api/quote', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(payload),
+        });
+
+        if (!res.ok) {
+          let reason = `The server replied ${res.status}.`;
+          try {
+            const body = await res.json();
+            if (body?.error) reason = body.error;
+            if (body?.fields) {
+              Object.entries(body.fields as Record<string, string>).forEach(([f, m]) =>
+                showError(f, m)
+              );
+            }
+          } catch {
+            /* non-JSON error body — keep the status message */
+          }
+          throw new Error(reason);
+        }
+
+        setState('success');
+        form.reset();
+        okBox.scrollIntoView({ block: 'center', behavior: 'smooth' });
+      } catch (err) {
+        errBody.textContent =
+          err instanceof Error && err.message
+            ? `${err.message} You can email us directly and we'll pick it up from there.`
+            : 'Something went wrong on our side. Please email us directly.';
+        setState('error');
+      }
+    });
+  }
+</script>

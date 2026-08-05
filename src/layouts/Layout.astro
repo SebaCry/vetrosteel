@@ -5,6 +5,7 @@ import '@fontsource/cinzel/600.css';
 import '@fontsource/cinzel/700.css';
 import '@fontsource-variable/montserrat';
 import '../styles/global.css';
+import { site } from '../data/site';
 
 interface Props {
   title?: string;
@@ -12,8 +13,8 @@ interface Props {
 }
 
 const {
-  title = 'Vetro Steel Design Studio LLC — Precision Stainless Steel & Glass',
-  description = 'Industrial design, technical modeling and architectural solutions in stainless steel and glass. We turn concepts into projects ready for fabrication and installation. Utah, USA.',
+  title = `${site.legalName} — ${site.tagline}`,
+  description = 'Premium glass hardware and architectural systems in tempered glass and stainless steel. Shower enclosures, sliding systems, railings, pull handles and entrance systems for commercial and residential projects. Utah, USA.',
 } = Astro.props;
 
 const canonical = Astro.site ? new URL(Astro.url.pathname, Astro.site).href : Astro.url.pathname;
@@ -36,14 +37,29 @@ const canonical = Astro.site ? new URL(Astro.url.pathname, Astro.site).href : As
     <meta property="og:type" content="website" />
     <meta property="og:title" content={title} />
     <meta property="og:description" content={description} />
+    <meta property="og:url" content={canonical} />
     <meta property="og:locale" content="en_US" />
+    <meta property="og:site_name" content={site.name} />
     <meta name="twitter:card" content="summary_large_image" />
   </head>
   <body>
+    <a
+      href="#main"
+      class="sr-only focus:not-sr-only focus:fixed focus:z-[100] focus:top-4 focus:left-4 focus:bg-sand focus:text-ink focus:px-5 focus:py-3 focus:font-semibold focus:uppercase focus:tracking-[0.14em] focus:text-[0.8rem]"
+    >
+      Skip to content
+    </a>
+
     <slot />
 
     <script>
-      // Scroll-reveal — respects reduced motion via CSS.
+      import Lenis from 'lenis';
+
+      const reduced = window.matchMedia('(prefers-reduced-motion: reduce)');
+
+      /* ---------------------------------------------------------------- */
+      /*  Scroll reveal — unchanged behaviour, CSS handles reduced motion.  */
+      /* ---------------------------------------------------------------- */
       const items = document.querySelectorAll<HTMLElement>('[data-reveal]');
       if ('IntersectionObserver' in window) {
         const io = new IntersectionObserver(
@@ -61,6 +77,84 @@ const canonical = Astro.site ? new URL(Astro.url.pathname, Astro.site).href : As
       } else {
         items.forEach((el) => el.classList.add('is-visible'));
       }
+
+      /* ---------------------------------------------------------------- */
+      /*  Parallax — a slow counter-drift on hero photography. Deliberately */
+      /*  small: 44px of travel over a full viewport of scroll.             */
+      /* ---------------------------------------------------------------- */
+      const parallax = Array.from(document.querySelectorAll<HTMLElement>('[data-parallax]'));
+      const TRAVEL = 44;
+
+      const updateParallax = () => {
+        if (!parallax.length) return;
+        // An inline custom property outranks the reduced-motion rule in CSS,
+        // so the loop has to stand down here rather than be overridden there.
+        if (reduced.matches) {
+          for (const el of parallax) el.style.removeProperty('--py');
+          return;
+        }
+        const vh = window.innerHeight;
+        for (const el of parallax) {
+          const r = el.getBoundingClientRect();
+          if (r.bottom < -200 || r.top > vh + 200) continue;
+          // -1 above the fold, 0 centred, 1 below.
+          const progress = (r.top + r.height / 2 - vh / 2) / vh;
+          el.style.setProperty('--py', `${(progress * TRAVEL).toFixed(1)}px`);
+        }
+      };
+
+      /* ---------------------------------------------------------------- */
+      /*  Lenis — skipped entirely under reduced motion, where the native   */
+      /*  scroll is the correct behaviour.                                  */
+      /* ---------------------------------------------------------------- */
+      let lenis: InstanceType<typeof Lenis> | null = null;
+
+      const startLenis = () => {
+        if (lenis || reduced.matches) return;
+        lenis = new Lenis({
+          duration: 1.15,
+          easing: (t: number) => Math.min(1, 1.001 - Math.pow(2, -10 * t)),
+          smoothWheel: true,
+          touchMultiplier: 1.4,
+        });
+        lenis.on('scroll', updateParallax);
+        const raf = (time: number) => {
+          lenis?.raf(time);
+          requestAnimationFrame(raf);
+        };
+        requestAnimationFrame(raf);
+      };
+
+      const stopLenis = () => {
+        lenis?.destroy();
+        lenis = null;
+        document.documentElement.classList.remove('lenis', 'lenis-smooth');
+      };
+
+      startLenis();
+      reduced.addEventListener('change', () => {
+        if (reduced.matches) stopLenis();
+        else startLenis();
+      });
+
+      if (!lenis) window.addEventListener('scroll', updateParallax, { passive: true });
+      window.addEventListener('resize', updateParallax, { passive: true });
+      updateParallax();
+
+      /* ---------------------------------------------------------------- */
+      /*  In-page anchors need to go through Lenis, not the browser.        */
+      /* ---------------------------------------------------------------- */
+      document.addEventListener('click', (e) => {
+        const link = (e.target as HTMLElement | null)?.closest<HTMLAnchorElement>('a[href^="#"]');
+        if (!link || !lenis) return;
+        const id = link.getAttribute('href')!;
+        if (id === '#' || id.length < 2) return;
+        const target = document.querySelector(id);
+        if (!target) return;
+        e.preventDefault();
+        lenis.scrollTo(target as HTMLElement, { offset: -96 });
+        history.pushState(null, '', id);
+      });
     </script>
   </body>
 </html>

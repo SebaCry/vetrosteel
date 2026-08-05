@@ -1,13 +1,18 @@
 ---
+import { Image } from 'astro:assets';
+import { asset } from '../lib/images';
 ---
 <section class="relative isolate bg-deep-teal text-warm-gray py-24 sm:py-32 overflow-hidden">
   <!-- background image -->
-  <img
-    src="/images/arch/mission.jpg"
+  <Image
+    src={asset('scenes/skylight-structure.jpg')}
     alt=""
     aria-hidden="true"
-    class="absolute inset-0 -z-10 w-full h-full object-cover duotone opacity-25"
+    widths={[800, 1280, 1800]}
+    sizes="100vw"
     loading="lazy"
+    decoding="async"
+    class="absolute inset-0 -z-10 w-full h-full object-cover duotone opacity-25"
   />
   <div class="absolute inset-0 -z-10 bg-gradient-to-b from-deep-teal via-deep-teal/85 to-deep-teal"></div>
   <div class="absolute inset-0 -z-10 blueprint-grid opacity-30"></div>

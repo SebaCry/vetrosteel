@@ -1,0 +1,421 @@
+---
+import { Image } from 'astro:assets';
+import SectionHeader from './ui/SectionHeader.astro';
+import MaterialNote from './ui/MaterialNote.astro';
+import { asset } from '../lib/images';
+import type { PlanItem } from '../data/verticals';
+
+/**
+ * Technical drawings treated as content, not decoration: zoom, pan, per-sheet
+ * legend and a units strip. Works with wheel + drag on desktop, pinch + drag
+ * on touch, and buttons/keyboard for everyone else.
+ */
+interface Props {
+  plans: PlanItem[];
+  title: string;
+  lead: string;
+  gap?: { where: string; needs: string };
+}
+const { plans, title, lead, gap } = Astro.props;
+// Stable across builds — ids only need to be unique within a page.
+const uid = title.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '').slice(0, 24);
+---
+
+<section id="technical" class="relative bg-paper text-ink py-24 sm:py-32">
+  <div class="mx-auto max-w-7xl px-5 sm:px-8">
+    <SectionHeader eyebrow="Technical material" title={title} lead={lead} tone="light" class="mb-14" />
+
+    {gap && <MaterialNote where={gap.where} needs={gap.needs} />}
+
+    <div class="grid lg:grid-cols-12 gap-8 lg:gap-10" data-plan-viewer data-reveal>
+      <!-- Sheet index. min-w-0: a grid item defaults to min-width:auto, which
+           would let the tab strip's intrinsic width push the page sideways
+           instead of scrolling inside its own container. -->
+      <div class="lg:col-span-4 xl:col-span-3 order-1 min-w-0">
+        <p class="text-[0.66rem] uppercase tracking-[0.26em] text-teal/80 mb-4">Sheets</p>
+        <div
+          class="flex lg:flex-col gap-2 overflow-x-auto lg:overflow-visible max-w-full -mx-5 px-5 lg:mx-0 lg:px-0 pb-2 lg:pb-0 snap-x"
+          role="tablist"
+          aria-label="Technical sheets"
+        >
+          {
+            plans.map((p, i) => (
+              <button
+                type="button"
+                role="tab"
+                id={`tab-${uid}-${i}`}
+                aria-controls={`panel-${uid}-${i}`}
+                aria-selected={i === 0 ? 'true' : 'false'}
+                tabindex={i === 0 ? 0 : -1}
+                data-tab={i}
+                class="snap-start shrink-0 lg:shrink text-left border border-deep-teal/15 bg-white/60 px-4 py-3.5 min-w-[13rem] lg:min-w-0 transition-colors duration-300 hover:border-sand aria-selected:border-sand aria-selected:bg-white"
+              >
+                <span class="flex items-center gap-3">
+                  <span class="font-display text-sm text-sand">
+                    {String(i + 1).padStart(2, '0')}
+                  </span>
+                  <span class="font-display text-sm font-semibold text-deep-teal leading-snug tracking-wide">
+                    {p.title}
+                  </span>
+                </span>
+              </button>
+            ))
+          }
+        </div>
+
+        <!-- Legend for the active sheet -->
+        {
+          plans.map((p, i) => (
+            <div data-legend={i} hidden={i !== 0} class="mt-8">
+              <p class="text-[0.66rem] uppercase tracking-[0.26em] text-teal/80 mb-4">Legend</p>
+              <dl class="border-t border-deep-teal/12">
+                {p.callouts.map((c) => (
+                  <div class="flex items-baseline justify-between gap-4 border-b border-deep-teal/12 py-3">
+                    <dt class="text-[0.78rem] text-ink/55">{c.label}</dt>
+                    <dd class="font-display text-sm font-semibold text-deep-teal text-right">
+                      {c.value}
+                    </dd>
+                  </div>
+                ))}
+              </dl>
+              <p class="mt-5 text-sm leading-relaxed text-ink/60">{p.caption}</p>
+            </div>
+          ))
+        }
+      </div>
+
+      <!-- Viewer -->
+      <div class="lg:col-span-8 xl:col-span-9 order-2 min-w-0">
+        <div class="tick-frame p-2.5">
+          <div class="relative border border-deep-teal/15 bg-white">
+            <!-- frame -->
+            <div
+              data-frame
+              class="plan-frame relative overflow-hidden bg-white aspect-[4/3] sm:aspect-[16/10] cursor-grab active:cursor-grabbing select-none"
+              tabindex="0"
+              role="group"
+              aria-label="Drawing viewer — drag to pan, scroll or pinch to zoom"
+            >
+              <div data-inner class="plan-inner absolute inset-0 will-change-transform">
+                {
+                  plans.map((p, i) => (
+                    <div
+                      data-panel={i}
+                      id={`panel-${uid}-${i}`}
+                      role="tabpanel"
+                      aria-labelledby={`tab-${uid}-${i}`}
+                      hidden={i !== 0}
+                      class="absolute inset-0 flex items-center justify-center p-4 sm:p-8"
+                    >
+                      <Image
+                        src={asset(p.image)}
+                        alt={`${p.title} — dimensioned drawing`}
+                        widths={[700, 1100, 1600]}
+                        sizes="(min-width:1024px) 60vw, 92vw"
+                        loading="lazy"
+                        decoding="async"
+                        draggable="false"
+                        class="max-w-full max-h-full w-auto h-auto object-contain pointer-events-none"
+                      />
+                    </div>
+                  ))
+                }
+              </div>
+
+              <!-- units / scale strip -->
+              {
+                plans.map((p, i) => (
+                  <p
+                    data-units={i}
+                    hidden={i !== 0}
+                    class="absolute left-3 bottom-3 bg-deep-teal/90 text-warm-gray text-[0.6rem] uppercase tracking-[0.16em] px-2.5 py-1.5"
+                  >
+                    {p.units}
+                  </p>
+                ))
+              }
+
+              <!-- zoom readout -->
+              <p
+                data-readout
+                class="absolute right-3 bottom-3 font-display text-[0.68rem] tracking-[0.12em] text-deep-teal/60 bg-white/85 px-2 py-1"
+              >
+                100%
+              </p>
+            </div>
+
+            <!-- controls -->
+            <div class="flex items-center justify-between gap-3 border-t border-deep-teal/12 px-3 py-2.5">
+              <p class="hidden sm:block text-[0.68rem] tracking-[0.1em] text-ink/45">
+                Drag to pan · scroll or pinch to zoom · double-tap to toggle
+              </p>
+              <p class="sm:hidden text-[0.68rem] tracking-[0.1em] text-ink/45">Pinch to zoom</p>
+              <div class="flex items-center gap-1.5">
+                <button type="button" data-zoom="out" aria-label="Zoom out" class="plan-btn">
+                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+                    <path d="M5 12h14" stroke-linecap="round" />
+                  </svg>
+                </button>
+                <button type="button" data-zoom="in" aria-label="Zoom in" class="plan-btn">
+                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+                    <path d="M12 5v14M5 12h14" stroke-linecap="round" />
+                  </svg>
+                </button>
+                <button type="button" data-zoom="reset" aria-label="Reset view" class="plan-btn">
+                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+                    <path d="M3 12a9 9 0 1 0 3-6.7M3 4v5h5" stroke-linecap="round" stroke-linejoin="round" />
+                  </svg>
+                </button>
+                <button type="button" data-zoom="full" aria-label="Open full screen" class="plan-btn">
+                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+                    <path d="M8 3H3v5M16 3h5v5M8 21H3v-5M16 21h5v-5" stroke-linecap="round" stroke-linejoin="round" />
+                  </svg>
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<style>
+  .plan-btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 2.25rem;
+    height: 2.25rem;
+    border: 1px solid color-mix(in srgb, var(--color-deep-teal) 18%, transparent);
+    color: var(--color-deep-teal);
+    transition: background-color 0.25s, border-color 0.25s, color 0.25s;
+  }
+  .plan-btn:hover {
+    background-color: var(--color-deep-teal);
+    border-color: var(--color-deep-teal);
+    color: var(--color-paper);
+  }
+
+  .plan-frame {
+    touch-action: pan-y;
+  }
+  .plan-frame[data-zoomed='true'] {
+    touch-action: none;
+  }
+
+  .plan-inner {
+    transform-origin: center center;
+    transition: transform 0.45s cubic-bezier(0.16, 1, 0.3, 1);
+  }
+  .plan-inner[data-dragging='true'] {
+    transition: none;
+  }
+
+  /* Fullscreen: the frame takes over the viewport rather than the whole card,
+     so the legend stays reachable behind it on mobile. */
+  .plan-frame:fullscreen {
+    aspect-ratio: auto;
+    width: 100vw;
+    height: 100vh;
+    background: #fff;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .plan-inner {
+      transition: none;
+    }
+  }
+</style>
+
+<script>
+  const MIN = 1;
+  const MAX = 6;
+
+  document.querySelectorAll<HTMLElement>('[data-plan-viewer]').forEach((root) => {
+    const frame = root.querySelector<HTMLElement>('[data-frame]');
+    const inner = root.querySelector<HTMLElement>('[data-inner]');
+    if (!frame || !inner) return;
+
+    const readout = root.querySelector<HTMLElement>('[data-readout]');
+    const tabs = Array.from(root.querySelectorAll<HTMLButtonElement>('[data-tab]'));
+    const panels = Array.from(root.querySelectorAll<HTMLElement>('[data-panel]'));
+    const legends = Array.from(root.querySelectorAll<HTMLElement>('[data-legend]'));
+    const units = Array.from(root.querySelectorAll<HTMLElement>('[data-units]'));
+
+    let scale = 1;
+    let tx = 0;
+    let ty = 0;
+
+    const apply = () => {
+      inner.style.transform = `translate3d(${tx}px, ${ty}px, 0) scale(${scale})`;
+      frame.dataset.zoomed = scale > 1.01 ? 'true' : 'false';
+      if (readout) readout.textContent = `${Math.round(scale * 100)}%`;
+    };
+
+    const clamp = () => {
+      const r = frame.getBoundingClientRect();
+      const maxX = Math.max(0, (r.width * scale - r.width) / 2);
+      const maxY = Math.max(0, (r.height * scale - r.height) / 2);
+      tx = Math.min(maxX, Math.max(-maxX, tx));
+      ty = Math.min(maxY, Math.max(-maxY, ty));
+    };
+
+    /** Zoom about a point expressed relative to the frame's centre. */
+    const zoomTo = (next: number, px = 0, py = 0) => {
+      const target = Math.min(MAX, Math.max(MIN, next));
+      const k = target / scale;
+      tx = px - (px - tx) * k;
+      ty = py - (py - ty) * k;
+      scale = target;
+      clamp();
+      apply();
+    };
+
+    const reset = () => {
+      scale = 1;
+      tx = 0;
+      ty = 0;
+      apply();
+    };
+
+    const pointFromEvent = (clientX: number, clientY: number) => {
+      const r = frame.getBoundingClientRect();
+      return { px: clientX - r.left - r.width / 2, py: clientY - r.top - r.height / 2 };
+    };
+
+    /* ---- wheel ---- */
+    frame.addEventListener(
+      'wheel',
+      (e) => {
+        if (!e.ctrlKey && scale === MIN && Math.abs(e.deltaY) > 0) {
+          // Let the page scroll past an un-zoomed drawing instead of trapping it.
+          if (e.deltaY > 0) return;
+        }
+        e.preventDefault();
+        const { px, py } = pointFromEvent(e.clientX, e.clientY);
+        zoomTo(scale * (e.deltaY < 0 ? 1.18 : 1 / 1.18), px, py);
+      },
+      { passive: false }
+    );
+
+    /* ---- drag / pinch ---- */
+    const active = new Map<number, { x: number; y: number }>();
+    let pinchStart = 0;
+    let scaleStart = 1;
+
+    frame.addEventListener('pointerdown', (e) => {
+      frame.setPointerCapture(e.pointerId);
+      active.set(e.pointerId, { x: e.clientX, y: e.clientY });
+      if (active.size === 2) {
+        const [a, b] = [...active.values()];
+        pinchStart = Math.hypot(a.x - b.x, a.y - b.y);
+        scaleStart = scale;
+      }
+      inner.dataset.dragging = 'true';
+    });
+
+    frame.addEventListener('pointermove', (e) => {
+      const prev = active.get(e.pointerId);
+      if (!prev) return;
+      const next = { x: e.clientX, y: e.clientY };
+
+      if (active.size === 2) {
+        active.set(e.pointerId, next);
+        const [a, b] = [...active.values()];
+        const dist = Math.hypot(a.x - b.x, a.y - b.y);
+        if (pinchStart > 0) {
+          const mid = pointFromEvent((a.x + b.x) / 2, (a.y + b.y) / 2);
+          zoomTo(scaleStart * (dist / pinchStart), mid.px, mid.py);
+        }
+        return;
+      }
+
+      if (scale > MIN) {
+        tx += next.x - prev.x;
+        ty += next.y - prev.y;
+        clamp();
+        apply();
+      }
+      active.set(e.pointerId, next);
+    });
+
+    const endPointer = (e: PointerEvent) => {
+      active.delete(e.pointerId);
+      if (active.size < 2) pinchStart = 0;
+      if (active.size === 0) delete inner.dataset.dragging;
+    };
+    frame.addEventListener('pointerup', endPointer);
+    frame.addEventListener('pointercancel', endPointer);
+
+    /* ---- double click / tap ---- */
+    frame.addEventListener('dblclick', (e) => {
+      const { px, py } = pointFromEvent(e.clientX, e.clientY);
+      if (scale > MIN) reset();
+      else zoomTo(2.5, px, py);
+    });
+
+    /* ---- keyboard ---- */
+    frame.addEventListener('keydown', (e) => {
+      const step = 60;
+      if (e.key === '+' || e.key === '=') { e.preventDefault(); zoomTo(scale * 1.25); }
+      else if (e.key === '-') { e.preventDefault(); zoomTo(scale / 1.25); }
+      else if (e.key === '0') { e.preventDefault(); reset(); }
+      else if (scale > MIN && e.key.startsWith('Arrow')) {
+        e.preventDefault();
+        if (e.key === 'ArrowLeft') tx += step;
+        if (e.key === 'ArrowRight') tx -= step;
+        if (e.key === 'ArrowUp') ty += step;
+        if (e.key === 'ArrowDown') ty -= step;
+        clamp();
+        apply();
+      }
+    });
+
+    /* ---- controls ---- */
+    root.querySelectorAll<HTMLButtonElement>('[data-zoom]').forEach((btn) => {
+      btn.addEventListener('click', () => {
+        const kind = btn.dataset.zoom;
+        if (kind === 'in') zoomTo(scale * 1.4);
+        else if (kind === 'out') zoomTo(scale / 1.4);
+        else if (kind === 'reset') reset();
+        else if (kind === 'full') {
+          if (document.fullscreenElement) document.exitFullscreen();
+          else frame.requestFullscreen?.().catch(() => {});
+        }
+      });
+    });
+
+    document.addEventListener('fullscreenchange', () => {
+      // Geometry changed underneath us; re-clamp rather than leaving it adrift.
+      clamp();
+      apply();
+    });
+
+    /* ---- sheet switching ---- */
+    const select = (index: number) => {
+      tabs.forEach((t, i) => {
+        t.setAttribute('aria-selected', String(i === index));
+        t.tabIndex = i === index ? 0 : -1;
+      });
+      panels.forEach((p, i) => (p.hidden = i !== index));
+      legends.forEach((l, i) => (l.hidden = i !== index));
+      units.forEach((u, i) => (u.hidden = i !== index));
+      reset();
+    };
+
+    tabs.forEach((tab, i) => {
+      tab.addEventListener('click', () => select(i));
+      tab.addEventListener('keydown', (e) => {
+        if (e.key !== 'ArrowRight' && e.key !== 'ArrowLeft' && e.key !== 'ArrowDown' && e.key !== 'ArrowUp') return;
+        e.preventDefault();
+        const dir = e.key === 'ArrowRight' || e.key === 'ArrowDown' ? 1 : -1;
+        const next = (i + dir + tabs.length) % tabs.length;
+        select(next);
+        tabs[next].focus();
+      });
+    });
+
+    apply();
+  });
+</script>

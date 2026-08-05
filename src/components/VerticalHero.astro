@@ -1,0 +1,90 @@
+---
+import Figure from './ui/Figure.astro';
+import type { Vertical } from '../data/verticals';
+import { site } from '../data/site';
+
+interface Props {
+  vertical: Vertical;
+}
+const { vertical: v } = Astro.props;
+---
+
+<section class="relative isolate min-h-[78svh] lg:min-h-[86svh] flex items-end overflow-hidden bg-ink">
+  <div class="absolute inset-0 -z-10">
+    <Figure
+      src={v.hero.image}
+      alt={v.hero.alt}
+      fill
+      sizes="100vw"
+      widths={[800, 1280, 1800, 2400]}
+      eager
+      parallax
+    />
+    <div
+      class="absolute inset-0"
+      style="background:linear-gradient(180deg, rgba(7,30,36,0.86) 0%, rgba(7,30,36,0.42) 42%, rgba(7,30,36,0.94) 100%);"
+    >
+    </div>
+    <div class="absolute inset-0 blueprint-grid opacity-40"></div>
+  </div>
+
+  <div class="mx-auto max-w-7xl w-full px-5 sm:px-8 pt-36 pb-16 sm:pb-20">
+    <nav aria-label="Breadcrumb" class="mb-8" data-reveal>
+      <ol class="flex items-center gap-2 text-[0.7rem] uppercase tracking-[0.2em] text-warm-gray/45">
+        <li><a href="/" class="hover:text-sand transition-colors">Home</a></li>
+        <li aria-hidden="true">/</li>
+        <li class="text-sand/90">{v.nav}</li>
+      </ol>
+    </nav>
+
+    <div class="max-w-3xl">
+      <p class="eyebrow text-light-teal mb-7 flex items-center gap-3" data-reveal style="--reveal-delay:60ms">
+        <span class="inline-block w-9 h-px bg-sand"></span>
+        {site.tagline}
+      </p>
+
+      <h1
+        class="font-display font-semibold text-warm-gray leading-[1.06] text-4xl sm:text-6xl lg:text-[4.25rem]"
+        data-reveal
+        style="--reveal-delay:130ms"
+      >
+        {v.headline}
+      </h1>
+
+      <p
+        class="mt-8 max-w-xl text-base sm:text-lg leading-relaxed text-warm-gray/75"
+        data-reveal
+        style="--reveal-delay:240ms"
+      >
+        {v.lead}
+      </p>
+
+      <div class="mt-10 flex flex-col sm:flex-row gap-4" data-reveal style="--reveal-delay:340ms">
+        <a
+          href={`/quote?for=${v.slug}`}
+          class="group inline-flex items-center justify-center gap-2 bg-sand text-ink font-semibold uppercase tracking-[0.14em] text-[0.82rem] px-7 py-4 hover:bg-sand-bright transition-colors duration-300"
+        >
+          Request a quote
+          <svg
+            width="16"
+            height="16"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="2"
+            class="transition-transform duration-300 group-hover:translate-x-1"
+            aria-hidden="true"
+          >
+            <path d="M5 12h14M13 6l6 6-6 6" stroke-linecap="round" stroke-linejoin="round"></path>
+          </svg>
+        </a>
+        <a
+          href="#technical"
+          class="inline-flex items-center justify-center gap-2 border border-light-teal/40 text-warm-gray font-semibold uppercase tracking-[0.14em] text-[0.82rem] px-7 py-4 hover:border-sand hover:text-sand transition-colors duration-300"
+        >
+          See the drawings
+        </a>
+      </div>
+    </div>
+  </div>
+</section>

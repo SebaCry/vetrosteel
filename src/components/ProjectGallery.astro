@@ -1,0 +1,56 @@
+---
+import Figure from './ui/Figure.astro';
+import SectionHeader from './ui/SectionHeader.astro';
+import MaterialNote from './ui/MaterialNote.astro';
+import type { GalleryItem } from '../data/verticals';
+
+interface Props {
+  eyebrow?: string;
+  title: string;
+  lead?: string;
+  items: GalleryItem[];
+  gaps?: { where: string; needs: string }[];
+  id?: string;
+}
+const { eyebrow = 'Selected work', title, lead, items, gaps = [], id = 'work' } = Astro.props;
+---
+
+<section id={id} class="relative bg-ink text-warm-gray py-24 sm:py-32">
+  <div class="mx-auto max-w-7xl px-5 sm:px-8">
+    <SectionHeader eyebrow={eyebrow} title={title} lead={lead} tone="dark" class="mb-14" />
+
+    {gaps.map((g) => <MaterialNote where={g.where} needs={g.needs} />)}
+
+    <div class="grid sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-5">
+      {
+        items.map((it, i) => (
+          <figure
+            class="group relative overflow-hidden bg-deep-teal"
+            data-reveal
+            style={`--reveal-delay:${(i % 3) * 120}ms`}
+          >
+            <Figure
+              src={it.image}
+              alt={it.label}
+              ratio="aspect-[4/5]"
+              sizes="(min-width:1024px) 31vw, (min-width:640px) 46vw, 92vw"
+              widths={[420, 700, 1000, 1300]}
+              duotone
+              imgClass="transition-transform duration-[1100ms] ease-[cubic-bezier(0.16,1,0.3,1)] group-hover:scale-[1.06]"
+            >
+              <div class="absolute inset-0 bg-gradient-to-t from-ink via-ink/30 to-transparent" />
+              <div class="absolute inset-0 ring-1 ring-inset ring-white/10" />
+            </Figure>
+            <figcaption class="absolute inset-x-0 bottom-0 p-6 sm:p-7">
+              <span class="block w-8 h-px bg-sand mb-4 transition-all duration-500 group-hover:w-14" />
+              <h3 class="font-display text-lg sm:text-xl font-semibold text-warm-gray tracking-wide">
+                {it.label}
+              </h3>
+              <p class="mt-2 text-sm leading-relaxed text-warm-gray/70">{it.note}</p>
+            </figcaption>
+          </figure>
+        ))
+      }
+    </div>
+  </div>
+</section>

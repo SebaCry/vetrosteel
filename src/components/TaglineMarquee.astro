@@ -1,0 +1,44 @@
+---
+/**
+ * Brand taglines on a slow loop. Carried over from the old Contact section
+ * when that page moved to /quote.
+ */
+const taglines = [
+  'Precision Built in Steel & Glass',
+  'Where Design Becomes Structure',
+  'Turning Concepts Into Architectural Reality',
+  'Designed to Fit. Built to Last.',
+];
+---
+
+<div class="bg-ink border-y border-white/8 py-5 overflow-hidden" aria-hidden="true">
+  <div class="marquee flex gap-10 whitespace-nowrap w-max">
+    {
+      [...taglines, ...taglines].map((t) => (
+        <span class="flex items-center gap-10 font-display text-sm tracking-[0.2em] uppercase text-warm-gray/40">
+          {t}
+          <span class="inline-block w-1.5 h-1.5 rotate-45 bg-sand/70" />
+        </span>
+      ))
+    }
+  </div>
+</div>
+
+<style>
+  @keyframes marquee {
+    from {
+      transform: translateX(0);
+    }
+    to {
+      transform: translateX(-50%);
+    }
+  }
+  .marquee {
+    animation: marquee 34s linear infinite;
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .marquee {
+      animation: none;
+    }
+  }
+</style>

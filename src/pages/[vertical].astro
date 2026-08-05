@@ -1,0 +1,100 @@
+---
+import Layout from '../layouts/Layout.astro';
+import Nav from '../components/Nav.astro';
+import Footer from '../components/Footer.astro';
+import VerticalHero from '../components/VerticalHero.astro';
+import CategoryRow from '../components/CategoryRow.astro';
+import PlanViewer from '../components/PlanViewer.astro';
+import ProductGrid from '../components/ProductGrid.astro';
+import ProcessSteps from '../components/ProcessSteps.astro';
+import ProjectGallery from '../components/ProjectGallery.astro';
+import CTABand from '../components/ui/CTABand.astro';
+import { verticals, type Vertical } from '../data/verticals';
+import { site } from '../data/site';
+
+/**
+ * One template, one route, both verticals — and any line added to
+ * `verticals` later gets its page, nav entry and sitemap URL for free.
+ */
+export function getStaticPaths() {
+  return verticals.map((v) => ({
+    params: { vertical: v.slug },
+    props: { v },
+  }));
+}
+
+interface Props {
+  v: Vertical;
+}
+const { v } = Astro.props;
+
+const gap = (where: string) => v.gaps.find((g) => g.where === where);
+---
+
+<Layout
+  title={`${v.nav} — ${v.headline} | ${site.name}`}
+  description={v.lead}
+>
+  <Nav />
+  <main id="main">
+    <VerticalHero vertical={v} />
+
+    <!-- Intro -->
+    <section class="relative bg-paper text-ink py-24 sm:py-28">
+      <div class="mx-auto max-w-7xl px-5 sm:px-8">
+        <div class="grid lg:grid-cols-12 gap-10 lg:gap-16">
+          <div class="lg:col-span-5" data-reveal>
+            <p class="eyebrow text-teal mb-6 flex items-center gap-3">
+              <span class="inline-block w-9 h-px bg-sand rule-draw"></span>
+              {v.eyebrow}
+            </p>
+            <h2 class="font-display font-semibold text-3xl sm:text-4xl leading-[1.14] text-deep-teal">
+              {v.intro.title}
+            </h2>
+          </div>
+          <div class="lg:col-span-7 space-y-6" data-reveal style="--reveal-delay:130ms">
+            {
+              v.intro.body.map((p) => (
+                <p class="text-base sm:text-lg leading-relaxed text-ink/70">{p}</p>
+              ))
+            }
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <CategoryRow
+      eyebrow="What we do"
+      title="Systems we build"
+      lead={`The ${v.nav.toLowerCase()} side of the catalog, grouped the way projects actually get specified.`}
+      items={v.categories}
+    />
+
+    <PlanViewer
+      plans={v.plans}
+      title={v.planIntro.title}
+      lead={v.planIntro.body}
+      gap={gap('Office partition drawings')}
+    />
+
+    <ProductGrid
+      eyebrow="Hardware"
+      title="From the catalog"
+      lead="Fittings we stock and specify, in the finish families they ship in."
+      items={v.products}
+      gap={gap('Product specifications')}
+    />
+
+    <ProcessSteps steps={v.process} />
+
+    <ProjectGallery
+      title="Selected work"
+      lead={`${v.nav} installations in tempered glass and stainless steel.`}
+      items={v.gallery}
+      gaps={[gap('Project gallery'), gap('Before / after')].filter((g) => g !== undefined)}
+    />
+
+    <CTABand headline={v.cta.headline} body={v.cta.body} vertical={v.slug} />
+  </main>
+  <Footer />
+</Layout>

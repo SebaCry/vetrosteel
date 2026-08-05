@@ -1,0 +1,41 @@
+---
+/**
+ * Compact form of the values block for the home page — the full cards with
+ * their copy live on /about, so this stays a rhythm break, not a wall of text.
+ */
+const values = [
+  'Precision',
+  'Innovation',
+  'Commitment',
+  'Premium Quality',
+  'Trust',
+  'Efficiency',
+  'Excellence',
+];
+---
+
+<section class="relative bg-paper text-ink py-16 sm:py-20 overflow-hidden">
+  <div class="mx-auto max-w-7xl px-5 sm:px-8">
+    <div class="flex flex-col lg:flex-row lg:items-center gap-8 lg:gap-14" data-reveal>
+      <p class="eyebrow text-teal flex items-center gap-3 shrink-0">
+        <span class="inline-block w-9 h-px bg-sand rule-draw"></span>
+        What holds it together
+      </p>
+
+      <ul class="flex flex-wrap items-center gap-x-3 gap-y-3">
+        {
+          values.map((v, i) => (
+            <li class="flex items-center gap-3">
+              <span class="font-display text-lg sm:text-xl font-semibold text-deep-teal tracking-wide">
+                {v}
+              </span>
+              {i < values.length - 1 && (
+                <span class="inline-block w-1.5 h-1.5 rotate-45 bg-sand/70" aria-hidden="true" />
+              )}
+            </li>
+          ))
+        }
+      </ul>
+    </div>
+  </div>
+</section>

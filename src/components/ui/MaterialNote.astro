@@ -1,0 +1,34 @@
+---
+/**
+ * Marks a section that is running on placeholder material.
+ *
+ * Visible in `astro dev`, and in any build run with PUBLIC_SHOW_GAPS=true —
+ * which is how the client preview is deployed, so they can see exactly what
+ * they still owe us. A plain `npm run build` renders nothing at all, so the
+ * production site never ships these.
+ */
+interface Props {
+  where: string;
+  needs: string;
+}
+
+const { where, needs } = Astro.props;
+const show = import.meta.env.DEV || import.meta.env.PUBLIC_SHOW_GAPS === 'true';
+---
+
+{
+  show && (
+    <aside
+      class="not-prose my-6 border-l-2 border-amber-400/70 bg-amber-400/8 px-5 py-4 text-left"
+      data-material-gap={where}
+    >
+      <p class="flex items-center gap-2 text-[0.68rem] font-semibold uppercase tracking-[0.22em] text-amber-300">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+          <path d="M12 9v4m0 4h.01M10.3 3.9 1.8 18a2 2 0 0 0 1.7 3h17a2 2 0 0 0 1.7-3L13.7 3.9a2 2 0 0 0-3.4 0Z" stroke-linecap="round" stroke-linejoin="round" />
+        </svg>
+        Material pending — {where}
+      </p>
+      <p class="mt-2 text-sm leading-relaxed text-amber-100/80">{needs}</p>
+    </aside>
+  )
+}

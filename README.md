@@ -1,91 +1,177 @@
-# Vetro Steel Design Studio — Landing Page
+# Vetro Steel Design Studio — Sitio web
 
-Landing page corporativa de **Vetro Steel Design Studio LLC**, construida con
-**Astro + Tailwind CSS v4 + astro-icon** y animaciones de scroll.
+Sitio de **Vetro Steel Design Studio LLC**, construido con **Astro + Tailwind
+CSS v4**. El sitio está en **inglés**; esta documentación en español.
 
-Diseño, tipografía (Cinzel + Montserrat) y paleta (deep teal / sand) tomados
-directamente del brand board oficial.
+Terminología, paleta y taxonomía de producto salen del catálogo del cliente
+(*PRODUCT CATALOG — MAY 2026, "Premium Glass Hardware & Architectural Systems"*):
+**Sliding Systems · Shower Hardware · Pull Handles · Railings · Entrance Systems**.
+
+---
+
+## Arquitectura
+
+El sitio pasó de landing de una página a multipágina, con una entrada propia
+por vertical de negocio.
+
+```
+/              Home — hero, bifurcación de verticales, estudio, capacidades,
+               obra destacada, valores, CTA
+/commercial    Vertical comercial   ┐ misma plantilla,
+/residential   Vertical residencial ┘ distinta data
+/about         Estudio completo: about, misión, visión, capacidades, valores
+/quote         Formulario de cotización
+```
+
+### Añadir una tercera línea de producto
+
+Todo lo que define una vertical vive en [`src/data/verticals.ts`](src/data/verticals.ts).
+Añadir una entrada al array `verticals` genera automáticamente:
+
+- la página en `/<slug>` (vía [`src/pages/[vertical].astro`](src/pages/[vertical].astro))
+- su URL en el sitemap
+- su opción en el `<select>` del formulario de cotización
+
+Solo hay que añadirla a mano a `mainNav` en [`src/data/site.ts`](src/data/site.ts).
+
+### Sistema de componentes
+
+| Componente | Rol |
+| ---------- | --- |
+| `ui/Figure.astro` | **Único** punto donde se renderiza imagen. Todo pasa por `astro:assets` → AVIF/WebP + `srcset` |
+| `ui/SectionHeader.astro` | Eyebrow + regla + titular, con `tone` claro/oscuro |
+| `ui/CTABand.astro` | Bloque de cierre; `vertical` preselecciona el formulario |
+| `ui/PageHeader.astro` | Cabecera de páginas sin hero fotográfico |
+| `ui/MaterialNote.astro` | Marca de material pendiente (ver abajo) |
+| `VerticalSplit` | Bifurcación de verticales en el home |
+| `VerticalHero` `CategoryRow` `ProductGrid` `ProcessSteps` `ProjectGallery` | Secciones de vertical, alimentadas por datos |
+| `PlanViewer` | Visor de planos técnicos: zoom, paneo, leyenda, escala |
+| `QuoteForm` | Formulario con validación y estados |
+
+Las imágenes se referencian **por clave de texto** (`'scenes/storefront-entrance.jpg'`)
+y se resuelven en [`src/lib/images.ts`](src/lib/images.ts), de modo que los
+archivos de datos no necesitan `import`.
 
 ---
 
 ## Stack
 
-| Pieza              | Tecnología                                   |
-| ------------------ | -------------------------------------------- |
-| Framework          | Astro 7 (salida estática)                    |
-| Estilos            | Tailwind CSS v4 (`@tailwindcss/vite`)        |
-| Iconos             | astro-icon + Lucide (`@iconify-json/lucide`) |
-| Tipografías        | `@fontsource` Cinzel + Montserrat (self-host)|
-| Animaciones        | IntersectionObserver + CSS keyframes         |
-| SEO                | `@astrojs/sitemap`, meta OG, canonical       |
-| Hosting            | Cloudflare Pages                             |
+| Pieza | Tecnología |
+| ----- | ---------- |
+| Framework | Astro 7 (salida estática) |
+| Estilos | Tailwind CSS v4 (`@tailwindcss/vite`) |
+| Imagen | `astro:assets` + sharp → AVIF/WebP, `srcset` y lazy loading |
+| Smooth scroll | Lenis (desactivado bajo `prefers-reduced-motion`) |
+| Reveals / parallax | IntersectionObserver + CSS, parallax a medida (44px de recorrido) |
+| Iconos | astro-icon + Lucide |
+| Tipografías | `@fontsource` Cinzel + Montserrat (self-host) |
+| Formulario | Cloudflare Pages Function + Resend |
+| Hosting | Cloudflare Pages |
 
-## Desarrollo local
+---
+
+## Desarrollo
 
 ```bash
 npm install
 npm run dev        # http://localhost:4321
 npm run build      # genera /dist
-npm run preview    # sirve /dist localmente
+npm run preview    # sirve /dist (sin Pages Functions)
 ```
 
----
-
-> El sitio está en **inglés**. El contenido vive dentro de cada componente en
-> `src/components/`.
-
-## Antes de publicar — personaliza estos datos
-
-1. **Dominio**: en `astro.config.mjs`, cambia `site: 'https://vetrosteel.com'`
-   por el dominio final. Actualiza también `public/robots.txt`.
-2. **Email de contacto**: reemplaza `info@vetrosteel.com` en
-   `src/components/Contact.astro` y `src/components/Footer.astro`.
-3. **Fotos del equipo**: coloca las 4 fotos en `public/images/team/` con estos
-   nombres exactos y aparecen automáticamente (mientras no existan, se muestra
-   el monograma de iniciales como respaldo):
-   - `wilson.png` — Wilson Avila
-   - `eyenrivera.png` — Eyen Rivera
-   - `simonavila.png` — Simon Avila
-   - `jacoboavila.png` — Jacobo Avila
-   > Formato ideal: vertical (retrato), ~800×1000px. Puedes cambiar los nombres
-   > en `src/components/Team.astro` si prefieres otros.
-4. **Imágenes arquitectónicas** (About, Mission, Vision, Work): están en
-   `public/images/arch/` (`tower-1`, `tower-2`, `dome`, `corridor`, `mission`,
-   `about`). Son fotografía de referencia (Unsplash) con tratamiento monocromo;
-   reemplázalas por fotos reales de proyectos manteniendo el mismo nombre.
-5. **Teléfono / redes**: agrégalos en `Contact.astro` / `Footer.astro` si aplica.
-6. **Logo real**: el monograma VS es un SVG vectorial en `src/components/Logo.astro`.
-   Si tienes el logo oficial en SVG, reemplaza los `<path>` por los del archivo.
-
----
-
-## Desplegar en Cloudflare Pages
-
-### Opción A — Conectar repositorio (recomendado, con CI automático)
-
-1. Sube este proyecto a un repo de GitHub/GitLab.
-2. En el dashboard de Cloudflare: **Workers & Pages → Create → Pages →
-   Connect to Git**.
-3. Configura el build:
-   - **Framework preset**: `Astro`
-   - **Build command**: `npm run build`
-   - **Build output directory**: `dist`
-4. **Save and Deploy**. Cada `git push` re-despliega automáticamente.
-
-### Opción B — Subida directa con Wrangler (sin repo)
+**Ojo:** `astro preview` no ejecuta las Pages Functions, así que el formulario
+devolverá 404 al enviar. Para probarlo de verdad:
 
 ```bash
 npm run build
-npx wrangler pages deploy dist --project-name vetro-steel
+npx wrangler pages dev dist \
+  --binding RESEND_API_KEY=re_xxx \
+  --binding QUOTE_TO=contact@vetrosteelut.com \
+  --binding "QUOTE_FROM=Vetro Steel <quotes@vetrosteelut.com>"
 ```
 
-La primera vez, Wrangler pedirá login con tu cuenta de Cloudflare.
+### Capturas de verificación
 
-### Dominio propio
+```bash
+node shot.mjs http://localhost:4399 shots
+```
 
-En el proyecto de Pages → **Custom domains → Set up a domain** → escribe tu
-dominio. Si el DNS ya está en Cloudflare, el registro se crea solo; si no,
-apunta el `CNAME` al subdominio `*.pages.dev` indicado.
+Recorre las 5 páginas en desktop y móvil, fuerza la carga diferida, y captura
+además el visor de planos (reposo, con zoom, segunda hoja) y los estados de
+error del formulario.
+
+---
+
+## Material pendiente
+
+El sitio se maquetó con el material disponible y **marca explícitamente lo que
+falta** en lugar de rellenarlo con contenido genérico. Los huecos están
+declarados en el campo `gaps` de cada vertical y los pinta `MaterialNote`.
+
+Se muestran en `npm run dev` y en cualquier build lanzado con
+`PUBLIC_SHOW_GAPS=true`. Un `npm run build` normal **no los renderiza**, así que
+producción nunca los enseña.
+
+```bash
+PUBLIC_SHOW_GAPS=true npm run build   # preview para el cliente, con los huecos visibles
+npm run build                          # producción, limpio
+```
+
+Lo que falta hoy:
+
+1. **Fotografía de obra real.** No hay ninguna instalación ejecutada
+   documentada. Todo lo que se ve es fotografía de catálogo.
+2. **Planos de divisiones de oficina** en vectorial cotado (PDF o DWG). La
+   isométrica entregada no tiene cotas, escala ni leyenda, así que no puede
+   alimentar el visor. Hoy el visor usa las plantillas de corte de vidrio y las
+   vistas de bisagra del catálogo, que sí están cotadas.
+3. **Fichas técnicas**: espesor de vidrio, carga admisible y códigos de acabado
+   por herraje. Los acabados listados se leyeron de la fotografía del catálogo.
+4. **Pares antes/después** de un mismo baño. El componente comparador no se
+   construyó: emparejar fotos no relacionadas sería inventar.
+
+---
+
+## Despliegue en Cloudflare Pages
+
+### Build
+
+- **Framework preset**: `Astro`
+- **Build command**: `npm run build`
+- **Build output directory**: `dist`
+
+El directorio `functions/` de la raíz lo recoge Pages automáticamente; no forma
+parte del build de Astro.
+
+### Variables de entorno (Settings → Variables and Secrets)
+
+| Variable | Uso |
+| -------- | --- |
+| `RESEND_API_KEY` | API key de [Resend](https://resend.com) |
+| `QUOTE_TO` | Buzón que recibe las solicitudes |
+| `QUOTE_FROM` | Remitente verificado, p. ej. `Vetro Steel <quotes@vetrosteelut.com>` |
+
+Sin ellas el endpoint responde **503** y el formulario le dice al visitante que
+escriba por email, en vez de tragarse el lead en silencio.
+
+Respuestas del endpoint: `400` JSON inválido · `405` método distinto de POST ·
+`422` validación con errores por campo · `502` fallo de entrega · `503` sin
+configurar · `200` correcto (y también con el honeypot lleno, que se descarta
+en silencio).
+
+---
+
+## Antes de publicar
+
+1. **Dominio**: en `astro.config.mjs` cambia `site: 'https://vetrosteel.com'`
+   por el dominio final. Actualiza también `public/robots.txt`.
+2. **Email de contacto**: `site.email` en [`src/data/site.ts`](src/data/site.ts)
+   (un solo sitio; Footer, CTA y formulario lo leen de ahí).
+3. **Fotografía Unsplash sobrante**: `public/images/arch/` (24 MB) ya no lo
+   referencia nadie — se sustituyó por fotografía real del catálogo en
+   `src/assets/`. Se puede borrar entero para bajar el peso del despliegue.
+4. **Fotos de equipo**: siguen en `public/images/team/` pero no hay componente
+   `Team` que las muestre. Si se quiere sección de equipo, va en `/about`.
 
 ---
 
@@ -93,18 +179,20 @@ apunta el `CNAME` al subdominio `*.pages.dev` indicado.
 
 ```
 src/
-├─ layouts/Layout.astro        # <head>, fuentes, script de scroll-reveal
+├─ data/
+│  ├─ site.ts                  # identidad, contacto, navegación
+│  └─ verticals.ts             # LAS DOS VERTICALES: copy, producto, planos, proceso, huecos
+├─ lib/images.ts               # resolución de assets por clave
+├─ assets/                     # fotografía y planos del catálogo (pasa por astro:assets)
+│  ├─ scenes/  products/  plans/
+├─ layouts/Layout.astro        # <head>, Lenis, parallax, scroll-reveal
 ├─ components/
-│  ├─ Logo.astro               # monograma VS + wordmark (SVG)
-│  ├─ Nav.astro                # nav fijo + menú móvil
-│  ├─ Hero.astro               # hero con "cables" radiantes animados
-│  ├─ About.astro  Mission.astro  Vision.astro
-│  ├─ Services.astro  Gallery.astro  Values.astro  Team.astro
-│  └─ Contact.astro  Footer.astro
-├─ pages/index.astro           # ensambla la página
-└─ styles/global.css           # tokens de marca + utilidades + animaciones
+│  ├─ ui/                      # primitivas reutilizables
+│  └─ *.astro                  # secciones
+├─ pages/
+│  ├─ index.astro  about.astro  quote.astro
+│  └─ [vertical].astro         # genera /commercial y /residential
+└─ styles/global.css           # tokens de marca, utilidades, animaciones
 
-public/images/
-├─ arch/                       # fotografía arquitectónica (secciones + Work)
-└─ team/                       # ← coloca aquí las fotos del equipo
+functions/api/quote.ts         # Pages Function del formulario
 ```

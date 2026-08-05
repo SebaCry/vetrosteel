@@ -1,4 +1,8 @@
 ---
+import { Image } from 'astro:assets';
+import { site } from '../data/site';
+import { asset } from '../lib/images';
+
 // Radiating "cable" lines — evokes the cable-stayed bridge of the brand deck
 // and the vanishing-point perspective of a technical drawing.
 // viewBox is 160x100 — the same 16:10 aspect as the hero — so scaling is
@@ -27,13 +31,17 @@ const rays = Array.from({ length: 26 }, (_, i) => {
     </div>
     <!-- architectural backdrop: glass towers converging up, tinted to the teal
          and aligned with the cables' vanishing point -->
-    <img
-      src="/images/arch/tower-1.jpg"
+    <Image
+      src={asset('scenes/curtain-wall-facade.jpg')}
       alt=""
       aria-hidden="true"
+      widths={[800, 1280, 1800]}
+      sizes="100vw"
+      loading="eager"
+      decoding="sync"
+      fetchpriority="high"
       class="absolute inset-0 w-full h-full object-cover duotone opacity-[0.35] mix-blend-luminosity"
       style="object-position: 62% top;"
-      loading="eager"
     />
     <div class="absolute inset-0 blueprint-grid opacity-70"></div>
 
@@ -67,7 +75,7 @@ const rays = Array.from({ length: 26 }, (_, i) => {
     <div class="max-w-3xl">
       <p class="eyebrow text-light-teal mb-7 flex items-center gap-3" data-reveal>
         <span class="inline-block w-9 h-px bg-sand"></span>
-        Design · Modeling · Stainless Steel &amp; Glass
+        {site.tagline}
       </p>
 
       <h1 class="font-display font-semibold text-warm-gray leading-[1.05] text-5xl sm:text-6xl lg:text-7xl" data-reveal style="--reveal-delay:80ms">
@@ -77,27 +85,27 @@ const rays = Array.from({ length: 26 }, (_, i) => {
       </h1>
 
       <p class="mt-8 max-w-xl text-base sm:text-lg leading-relaxed text-warm-gray/75" data-reveal style="--reveal-delay:200ms">
-        We turn concepts into architectural solutions in stainless steel and
-        glass — ready for fabrication and installation. Technical precision,
-        expert guidance, and strategic supply of premium components, all in
-        one partner.
+        Shower enclosures, sliding systems, railings and entrance systems in
+        tempered glass and stainless steel — specified from our own hardware
+        catalog, cut to dimensioned templates, and installed by the people who
+        drew them.
       </p>
 
       <div class="mt-10 flex flex-col sm:flex-row gap-4" data-reveal style="--reveal-delay:320ms">
         <a
-          href="#services"
+          href="#verticals"
           class="group inline-flex items-center justify-center gap-2 bg-sand text-ink font-semibold uppercase tracking-[0.14em] text-[0.82rem] px-7 py-4 hover:bg-sand-bright transition-colors duration-300"
         >
-          Our services
+          See both lines
           <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="transition-transform duration-300 group-hover:translate-x-1">
             <path d="M5 12h14M13 6l6 6-6 6" stroke-linecap="round" stroke-linejoin="round" />
           </svg>
         </a>
         <a
-          href="#contact"
+          href="/quote"
           class="inline-flex items-center justify-center gap-2 border border-light-teal/40 text-warm-gray font-semibold uppercase tracking-[0.14em] text-[0.82rem] px-7 py-4 hover:border-sand hover:text-sand transition-colors duration-300"
         >
-          Start a project
+          Request a quote
         </a>
       </div>
     </div>
@@ -105,10 +113,13 @@ const rays = Array.from({ length: 26 }, (_, i) => {
 
   <!-- bottom credential strip -->
   <div class="absolute bottom-0 inset-x-0 border-t border-white/5">
-    <div class="mx-auto max-w-7xl px-5 sm:px-8 py-5 flex flex-wrap items-center gap-x-8 gap-y-2 text-[0.7rem] tracking-[0.22em] uppercase text-warm-gray/45">
-      <span class="text-sand/80">Utah · USA</span>
-      <span class="hidden sm:inline">Shop Drawings &amp; Technical Modeling</span>
-      <span class="hidden md:inline">Stainless Steel · Tempered Glass</span>
+    <div class="mx-auto max-w-7xl px-5 sm:px-8 py-5 flex flex-wrap items-center gap-x-7 gap-y-2 text-[0.7rem] tracking-[0.22em] uppercase text-warm-gray/45">
+      <span class="text-sand/80">{site.location}</span>
+      {
+        site.catalogCategories.map((c, i) => (
+          <span class:list={[i > 2 ? 'hidden lg:inline' : i > 0 ? 'hidden sm:inline' : '']}>{c}</span>
+        ))
+      }
     </div>
   </div>
 </section>

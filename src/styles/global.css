@@ -24,8 +24,27 @@
 /*  Base                                                               */
 /* ------------------------------------------------------------------ */
 html {
-  scroll-behavior: smooth;
   -webkit-text-size-adjust: 100%;
+}
+
+/* Native smooth scroll is the fallback; once Lenis is driving, it must not
+   also be running or anchor jumps fight each other. */
+html:not(.lenis) {
+  scroll-behavior: smooth;
+}
+
+/* ------------------------------------------------------------------ */
+/*  Lenis smooth scroll                                                */
+/* ------------------------------------------------------------------ */
+html.lenis,
+html.lenis body {
+  height: auto;
+}
+.lenis.lenis-stopped {
+  overflow: clip;
+}
+.lenis .lenis-content [data-lenis-prevent] {
+  overscroll-behavior: contain;
 }
 
 body {
@@ -96,6 +115,18 @@ body {
 }
 
 /* ------------------------------------------------------------------ */
+/*  Parallax                                                           */
+/*  The image is oversized by --pscale so there is headroom to travel   */
+/*  into; --py is written by the scroll loop in Layout.astro.           */
+/* ------------------------------------------------------------------ */
+.parallax-img {
+  --py: 0px;
+  --pscale: 1.12;
+  transform: translate3d(0, var(--py), 0) scale(var(--pscale));
+  will-change: transform;
+}
+
+/* ------------------------------------------------------------------ */
 /*  Scroll reveal animation                                            */
 /* ------------------------------------------------------------------ */
 [data-reveal] {
@@ -125,7 +156,7 @@ body {
 }
 
 @media (prefers-reduced-motion: reduce) {
-  html { scroll-behavior: auto; }
+  html:not(.lenis) { scroll-behavior: auto; }
   [data-reveal] {
     opacity: 1;
     transform: none;
@@ -133,6 +164,12 @@ body {
   }
   [data-reveal].is-visible .rule-draw {
     animation: none;
+  }
+  /* Keep the scale — it is what crops the image — but stop the travel. */
+  .parallax-img {
+    --py: 0px;
+    transition: none;
+    will-change: auto;
   }
 }
 
