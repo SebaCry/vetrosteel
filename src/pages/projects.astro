@@ -1,0 +1,43 @@
+---
+import Layout from '../layouts/Layout.astro';
+import Nav from '../components/Nav.astro';
+import Footer from '../components/Footer.astro';
+import PageHeader from '../components/ui/PageHeader.astro';
+import DrawingToBuilt from '../components/DrawingToBuilt.astro';
+import ProjectGallery from '../components/ProjectGallery.astro';
+import CTABand from '../components/ui/CTABand.astro';
+import { site } from '../data/site';
+import { projects } from '../data/showcase';
+---
+
+<Layout
+  title={`Projects — From drawing to built | ${site.name}`}
+  description="How a Vetro Steel job runs from set-out drawing to installed work, and a gallery of completed installations in tempered glass and stainless steel."
+>
+  <Nav />
+  <main id="main">
+    <PageHeader
+      crumb="Projects"
+      eyebrow="Projects"
+      title="From the drawing to the finished edge"
+      lead="Every job starts as a set-out and ends as something you can put your hand on. Here is both ends of that, on the same page."
+    />
+
+    <DrawingToBuilt />
+
+    <ProjectGallery
+      id="installed"
+      eyebrow="Installed work"
+      title="Completed installations"
+      lead="Photographs from finished sites — balustrades, partitions, stairs and fabricated steel."
+      items={projects}
+      duotone={false}
+    />
+
+    <CTABand
+      headline="Yours could be the next one"
+      body="Send us the drawing, or the room. We will tell you what it takes and what it costs."
+    />
+  </main>
+  <Footer />
+</Layout>

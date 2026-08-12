@@ -25,12 +25,14 @@ export const site = {
 export const mainNav = [
   { label: 'Commercial', href: '/commercial' },
   { label: 'Residential', href: '/residential' },
+  { label: 'Projects', href: '/projects' },
   { label: 'About', href: '/about' },
 ] as const;
 
 export const footerNav = [
   { label: 'Commercial', href: '/commercial' },
   { label: 'Residential', href: '/residential' },
+  { label: 'Projects', href: '/projects' },
   { label: 'About', href: '/about' },
   { label: 'Capabilities', href: '/about#capabilities' },
   { label: 'Values', href: '/about#values' },

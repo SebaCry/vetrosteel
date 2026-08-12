@@ -11,8 +11,18 @@ interface Props {
   items: GalleryItem[];
   gaps?: { where: string; needs: string }[];
   id?: string;
+  /** Off for photographs of real installations — there the finish is the point. */
+  duotone?: boolean;
 }
-const { eyebrow = 'Selected work', title, lead, items, gaps = [], id = 'work' } = Astro.props;
+const {
+  eyebrow = 'Selected work',
+  title,
+  lead,
+  items,
+  gaps = [],
+  id = 'work',
+  duotone = true,
+} = Astro.props;
 ---
 
 <section id={id} class="relative bg-ink text-warm-gray py-24 sm:py-32">
@@ -35,7 +45,7 @@ const { eyebrow = 'Selected work', title, lead, items, gaps = [], id = 'work' } 
               ratio="aspect-[4/5]"
               sizes="(min-width:1024px) 31vw, (min-width:640px) 46vw, 92vw"
               widths={[420, 700, 1000, 1300]}
-              duotone
+              duotone={duotone}
               imgClass="transition-transform duration-[1100ms] ease-[cubic-bezier(0.16,1,0.3,1)] group-hover:scale-[1.06]"
             >
               <div class="absolute inset-0 bg-gradient-to-t from-ink via-ink/30 to-transparent" />

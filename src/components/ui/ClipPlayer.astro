@@ -1,0 +1,193 @@
+---
+import { getImage } from 'astro:assets';
+import { asset, hasAsset } from '../../lib/images';
+
+/**
+ * Muted, looping clip that loads and plays only once it is on screen — the
+ * eight clips together are ~17MB, so nothing is fetched until it is needed.
+ *
+ * `watermark` covers the bottom-right corner with the Vetro Steel badge. The
+ * generated clips carry the Gemini sparkle at roughly 86-91% across and
+ * 81-89% down, so the badge is sized to sit over it with margin.
+ */
+interface Props {
+  slug: string;
+  title: string;
+  watermark?: boolean;
+  ratio?: string;
+  class?: string;
+}
+
+const { slug, title, watermark = false, ratio = 'aspect-video', class: className = '' } = Astro.props;
+
+const posterKey = `posters/${slug}.jpg`;
+const poster = hasAsset(posterKey)
+  ? (await getImage({ src: asset(posterKey), width: 1024, format: 'webp' })).src
+  : undefined;
+---
+
+<div class={`clip relative overflow-hidden bg-ink ${ratio} ${className}`} data-clip>
+  <video
+    class="absolute inset-0 w-full h-full object-cover"
+    data-src={`/video/${slug}.mp4`}
+    poster={poster}
+    muted
+    loop
+    playsinline
+    preload="none"
+    disablepictureinpicture
+    tabindex="-1"
+    aria-label={title}
+  ></video>
+
+  {
+    watermark && (
+      <div class="clip-badge absolute right-0 bottom-0 z-10 pointer-events-none">
+        <img src="/logo.png" alt="" aria-hidden="true" class="clip-badge-mark" />
+      </div>
+    )
+  }
+
+  <div class="absolute inset-0 ring-1 ring-inset ring-white/10 pointer-events-none"></div>
+
+  <button
+    type="button"
+    data-clip-toggle
+    class="clip-toggle absolute left-3 bottom-3 z-20"
+    aria-label={`Play ${title}`}
+    aria-pressed="false"
+  >
+    <svg data-icon-play width="14" height="14" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+      <path d="M8 5v14l11-7z"></path>
+    </svg>
+    <svg data-icon-pause width="14" height="14" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true" hidden>
+      <path d="M7 4h4v16H7zM13 4h4v16h-4z"></path>
+    </svg>
+  </button>
+</div>
+
+<style>
+  /* The badge sits over the generated-watermark corner. A soft scrim keeps the
+     mark legible whether the frame behind it is a dark floor or a white wall. */
+  .clip-badge {
+    width: 44%;
+    min-width: 10rem;
+    aspect-ratio: 2 / 1;
+    display: flex;
+    align-items: flex-end;
+    justify-content: flex-end;
+    padding: 0.7rem 0.9rem;
+    /* Opaque enough near the corner that the clip's own baked-in mark cannot
+       ghost through beside ours. */
+    background: radial-gradient(
+      125% 125% at 100% 100%,
+      rgba(7, 30, 36, 0.96) 0%,
+      rgba(7, 30, 36, 0.9) 42%,
+      rgba(7, 30, 36, 0.55) 66%,
+      rgba(7, 30, 36, 0) 84%
+    );
+  }
+  .clip-badge-mark {
+    width: 56%;
+    height: auto;
+    object-fit: contain;
+    filter: brightness(0) invert(1);
+    opacity: 0.92;
+  }
+
+  .clip-toggle {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 2.1rem;
+    height: 2.1rem;
+    color: var(--color-warm-gray);
+    background-color: rgba(7, 30, 36, 0.6);
+    border: 1px solid rgba(255, 255, 255, 0.18);
+    backdrop-filter: blur(4px);
+    opacity: 0;
+    transition: opacity 0.35s, background-color 0.3s, border-color 0.3s;
+  }
+  .clip:hover .clip-toggle,
+  .clip-toggle:focus-visible {
+    opacity: 1;
+  }
+  .clip-toggle:hover {
+    background-color: var(--color-deep-teal);
+    border-color: var(--color-sand);
+  }
+
+  /* Without autoplay the control is the only way in, so it always shows. */
+  @media (prefers-reduced-motion: reduce) {
+    .clip-toggle {
+      opacity: 1;
+    }
+  }
+</style>
+
+<script>
+  const reduced = window.matchMedia('(prefers-reduced-motion: reduce)');
+
+  document.querySelectorAll<HTMLElement>('[data-clip]').forEach((root) => {
+    const video = root.querySelector<HTMLVideoElement>('video');
+    const toggle = root.querySelector<HTMLButtonElement>('[data-clip-toggle]');
+    const iconPlay = root.querySelector<SVGElement>('[data-icon-play]');
+    const iconPause = root.querySelector<SVGElement>('[data-icon-pause]');
+    if (!video || !toggle) return;
+
+    let loaded = false;
+    /** Set by the user; once they take control, the observer stops overriding. */
+    let manual = false;
+
+    const load = () => {
+      if (loaded) return;
+      loaded = true;
+      video.src = video.dataset.src!;
+    };
+
+    const syncIcons = () => {
+      const playing = !video.paused && !video.ended;
+      iconPlay?.toggleAttribute('hidden', playing);
+      iconPause?.toggleAttribute('hidden', !playing);
+      toggle.setAttribute('aria-pressed', String(playing));
+      toggle.setAttribute(
+        'aria-label',
+        `${playing ? 'Pause' : 'Play'} ${video.getAttribute('aria-label') ?? 'clip'}`
+      );
+    };
+
+    video.addEventListener('play', syncIcons);
+    video.addEventListener('pause', syncIcons);
+
+    toggle.addEventListener('click', () => {
+      manual = true;
+      if (video.paused) {
+        load();
+        video.play().catch(() => {});
+      } else {
+        video.pause();
+      }
+    });
+
+    if ('IntersectionObserver' in window) {
+      const io = new IntersectionObserver(
+        (entries) => {
+          for (const entry of entries) {
+            if (entry.isIntersecting) {
+              load();
+              if (!manual && !reduced.matches) video.play().catch(() => {});
+            } else if (!video.paused) {
+              video.pause();
+              // Leaving the viewport is not the user pausing it.
+              if (!manual) video.currentTime = video.currentTime;
+            }
+          }
+        },
+        { threshold: 0.45 }
+      );
+      io.observe(root);
+    }
+
+    syncIcons();
+  });
+</script>

@@ -1,0 +1,167 @@
+---
+import SectionHeader from './ui/SectionHeader.astro';
+import ClipPlayer from './ui/ClipPlayer.astro';
+import { stages, transitions, spaces } from '../data/showcase';
+---
+
+<section id="drawing-to-built" class="relative bg-ink text-warm-gray py-24 sm:py-32 overflow-hidden">
+  <div class="absolute inset-0 blueprint-grid opacity-25"></div>
+
+  <!-- Wider than the rest of the site: the clips are the argument here, and at
+       max-w-7xl they were reading as thumbnails. Copy stays at 7xl so line
+       length does not blow out with them. -->
+  <div class="relative mx-auto max-w-[96rem] px-5 sm:px-8">
+    <div class="max-w-7xl">
+      <SectionHeader
+        eyebrow="Drawing → Built"
+        title="What the drawing promised, and what got installed"
+        lead="The same project seen twice: once as the set-out our shop works from, once as the finished work."
+        tone="dark"
+        class="mb-16"
+      />
+    </div>
+
+    <!-- Three stages, arrows between -->
+    <!-- Alternating full-width rows rather than a row of three: across three
+         columns each clip was down to ~430px, which is too small to read a
+         floor plan or a callout. Here each one gets roughly 55% of the page. -->
+    <ol class="space-y-12 sm:space-y-16">
+      {
+        stages.map((s, i) => (
+          <>
+            {i > 0 && (
+              <li aria-hidden="true" class="flex justify-center py-2 text-sand/40">
+                <svg
+                  class="w-7 h-7 sm:w-9 sm:h-9"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  stroke-width="1.5"
+                >
+                  <path d="M12 5v14M6 13l6 6 6-6" stroke-linecap="round" stroke-linejoin="round" />
+                </svg>
+              </li>
+            )}
+            <li
+              class="grid lg:grid-cols-12 gap-8 lg:gap-14 items-center"
+              data-reveal
+              style={`--reveal-delay:${i * 90}ms`}
+            >
+              <div class:list={['lg:col-span-7', i % 2 === 1 && 'lg:order-2']}>
+                <div class="tick-frame p-2.5">
+                  {/* The clips are 16:9; cropping them clips their own logo. */}
+                  <ClipPlayer slug={s.slug} title={s.title} watermark={s.watermark} />
+                </div>
+              </div>
+
+              <div class="lg:col-span-5">
+                <div class="flex items-baseline gap-4">
+                  <span class="font-display text-4xl sm:text-5xl font-semibold text-sand/45">
+                    {s.step}
+                  </span>
+                  <span class="eyebrow text-light-teal">{s.label}</span>
+                </div>
+                <h3 class="mt-5 font-display text-2xl sm:text-3xl font-semibold text-warm-gray tracking-wide leading-snug">
+                  {s.title}
+                </h3>
+                <span class="mt-5 block w-10 h-px bg-sand/60" />
+                <p class="mt-5 text-base leading-relaxed text-warm-gray/62">{s.note}</p>
+              </div>
+            </li>
+          </>
+        ))
+      }
+    </ol>
+
+    <!-- Split-screen transitions -->
+    <div class="mt-24 sm:mt-28">
+      <div class="max-w-2xl mb-12" data-reveal>
+        <p class="eyebrow text-sand mb-6 flex items-center gap-3">
+          <span class="inline-block w-9 h-px bg-sand rule-draw"></span>
+          Side by side
+        </p>
+        <h3 class="font-display font-semibold text-3xl sm:text-4xl leading-[1.12] text-warm-gray">
+          The drawing wipes into the building
+        </h3>
+      </div>
+
+      <!-- One per row. These carry the whole before/after idea, so they get the
+           most width on the page. -->
+      <div class="space-y-16 sm:space-y-20">
+        {
+          transitions.map((t, i) => (
+            <figure data-reveal style={`--reveal-delay:${i * 120}ms`}>
+              <div class="relative">
+                <ClipPlayer slug={t.slug} title={t.title} watermark={t.watermark} />
+
+                <div class="absolute inset-x-0 top-0 flex items-center justify-between p-4 sm:p-6 pointer-events-none">
+                  <span class="bg-ink/75 backdrop-blur-sm px-3 py-2 text-[0.62rem] sm:text-[0.7rem] uppercase tracking-[0.2em] text-warm-gray/85">
+                    {t.before}
+                  </span>
+                  <span class="flex items-center gap-2 text-sand/70">
+                    <svg
+                      class="w-6 h-6 sm:w-9 sm:h-9"
+                      viewBox="0 0 24 24"
+                      fill="none"
+                      stroke="currentColor"
+                      stroke-width="1.5"
+                      aria-hidden="true"
+                    >
+                      <path d="M5 12h14M13 6l6 6-6 6" stroke-linecap="round" stroke-linejoin="round" />
+                    </svg>
+                  </span>
+                  <span class="bg-sand/90 px-3 py-2 text-[0.62rem] sm:text-[0.7rem] uppercase tracking-[0.2em] text-ink font-semibold">
+                    {t.after}
+                  </span>
+                </div>
+              </div>
+              <figcaption class="mt-6 flex flex-col sm:flex-row sm:items-baseline sm:justify-between gap-2 sm:gap-8">
+                <h4 class="font-display text-xl sm:text-2xl font-semibold text-warm-gray tracking-wide">
+                  {t.title}
+                </h4>
+                <p class="sm:max-w-md text-sm leading-relaxed text-warm-gray/62">{t.note}</p>
+              </figcaption>
+            </figure>
+          ))
+        }
+      </div>
+    </div>
+
+    <!-- Finished spaces -->
+    <div class="mt-24 sm:mt-28">
+      <div class="max-w-2xl mb-12" data-reveal>
+        <p class="eyebrow text-sand mb-6 flex items-center gap-3">
+          <span class="inline-block w-9 h-px bg-sand rule-draw"></span>
+          In place
+        </p>
+        <h3 class="font-display font-semibold text-3xl sm:text-4xl leading-[1.12] text-warm-gray">
+          How the finished work reads
+        </h3>
+      </div>
+
+      <!-- Three across only once there is room for it; on a laptop that was
+           320px a clip. -->
+      <div class="grid sm:grid-cols-2 xl:grid-cols-3 gap-6 lg:gap-8">
+        {
+          spaces.map((s, i) => (
+            <figure data-reveal style={`--reveal-delay:${i * 120}ms`}>
+              <ClipPlayer slug={s.slug} title={s.title} watermark={s.watermark} />
+              <figcaption class="mt-4">
+                <h4 class="font-display text-base font-semibold text-warm-gray tracking-wide">
+                  {s.title}
+                </h4>
+                <p class="mt-2 text-sm leading-relaxed text-warm-gray/62">{s.note}</p>
+              </figcaption>
+            </figure>
+          ))
+        }
+      </div>
+    </div>
+
+    <p class="mt-14 max-w-3xl text-[0.78rem] leading-relaxed text-warm-gray/40" data-reveal>
+      The clips on this page are visualisations produced to communicate the
+      process. Photographs of completed installations are shown separately,
+      below.
+    </p>
+  </div>
+</section>
