@@ -50,7 +50,7 @@ import { stages, transitions, spaces } from '../data/showcase';
               <div class:list={['lg:col-span-7', i % 2 === 1 && 'lg:order-2']}>
                 <div class="tick-frame p-2.5">
                   {/* The clips are 16:9; cropping them clips their own logo. */}
-                  <ClipPlayer slug={s.slug} title={s.title} watermark={s.watermark} />
+                  <ClipPlayer slug={s.slug} title={s.title} watermark={s.watermark} start={s.start} end={s.end} />
                 </div>
               </div>
 
@@ -92,7 +92,7 @@ import { stages, transitions, spaces } from '../data/showcase';
           transitions.map((t, i) => (
             <figure data-reveal style={`--reveal-delay:${i * 120}ms`}>
               <div class="relative">
-                <ClipPlayer slug={t.slug} title={t.title} watermark={t.watermark} />
+                <ClipPlayer slug={t.slug} title={t.title} watermark={t.watermark} start={t.start} end={t.end} />
 
                 <div class="absolute inset-x-0 top-0 flex items-center justify-between p-4 sm:p-6 pointer-events-none">
                   <span class="bg-ink/75 backdrop-blur-sm px-3 py-2 text-[0.62rem] sm:text-[0.7rem] uppercase tracking-[0.2em] text-warm-gray/85">
@@ -145,7 +145,7 @@ import { stages, transitions, spaces } from '../data/showcase';
         {
           spaces.map((s, i) => (
             <figure data-reveal style={`--reveal-delay:${i * 120}ms`}>
-              <ClipPlayer slug={s.slug} title={s.title} watermark={s.watermark} />
+              <ClipPlayer slug={s.slug} title={s.title} watermark={s.watermark} start={s.start} end={s.end} />
               <figcaption class="mt-4">
                 <h4 class="font-display text-base font-semibold text-warm-gray tracking-wide">
                   {s.title}

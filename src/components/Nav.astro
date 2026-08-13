@@ -8,50 +8,65 @@ const isActive = (href: string) => path === href || path.startsWith(`${href}/`);
 
 <header
   id="site-nav"
-  class="fixed top-0 inset-x-0 z-50 transition-all duration-500 border-b border-transparent"
+  class="fixed top-0 inset-x-0 z-50 transition-all duration-500 border-b border-white/10 bg-ink/45 backdrop-blur-[6px]"
 >
   <nav
-    class="mx-auto max-w-7xl px-3 sm:px-8 flex items-center justify-between min-h-[88px] sm:min-h-[96px] py-1.5 sm:py-2"
+    class="mx-auto max-w-7xl px-4 sm:px-8 flex items-center justify-between min-h-18 sm:min-h-24 py-1.5 sm:py-2"
     aria-label="Main"
   >
-    <a href="/" class="flex items-center shrink-0" aria-label={`${'Vetro Steel'} — home`}>
-      <Logo variant="full" tone="light" class="h-20 sm:h-24" />
+    <!-- The full lockup at h-24 made the fixed bar 177px tall, which on a phone
+         is a fifth of the screen permanently occupied — and it was overlapping
+         the top of every page hero. -->
+    <a href="/" class="flex items-center shrink-0" aria-label="Vetro Steel — home">
+      <Logo variant="full" tone="light" size="h-14 sm:h-20 lg:h-24 w-auto" />
     </a>
 
-    <div class="hidden md:flex items-center gap-9">
+    <div class="hidden md:flex items-center gap-2 lg:gap-3">
       {
         mainNav.map((l) => (
           <a
             href={l.href}
             aria-current={isActive(l.href) ? 'page' : undefined}
             class:list={[
-              'relative text-[0.82rem] tracking-[0.14em] uppercase font-medium transition-colors duration-300 py-1',
-              isActive(l.href) ? 'text-sand' : 'text-warm-gray/75 hover:text-sand',
+              'relative px-3 lg:px-4 py-2.5 text-[0.84rem] tracking-[0.14em] uppercase font-semibold transition-colors duration-300',
+              isActive(l.href)
+                ? 'text-sand'
+                : 'text-warm-gray hover:text-sand',
             ]}
           >
             {l.label}
-            {isActive(l.href) && <span class="absolute -bottom-0.5 inset-x-0 h-px bg-sand" />}
+            <span
+              class:list={[
+                'absolute bottom-1 left-3 right-3 lg:left-4 lg:right-4 h-px bg-sand transition-transform duration-300 origin-left',
+                isActive(l.href) ? 'scale-x-100' : 'scale-x-0 hover:scale-x-100',
+              ]}
+            />
           </a>
         ))
       }
       <a
         href="/quote"
-        class="text-[0.82rem] tracking-[0.14em] uppercase font-semibold text-ink bg-sand px-5 py-2.5 hover:bg-sand-bright transition-colors duration-300"
+        class="ml-2 lg:ml-4 text-[0.84rem] tracking-[0.14em] uppercase font-semibold text-ink bg-sand px-5 py-3 hover:bg-sand-bright transition-colors duration-300"
       >
         Request a Quote
       </a>
     </div>
 
+    <!-- The burger was a bare 26px glyph on a transparent bar and people were
+         missing it. It is now a labelled, outlined control in the brand accent. -->
     <button
       id="menu-toggle"
-      class="md:hidden text-warm-gray p-2 -mr-2"
+      class="md:hidden group flex items-center gap-2.5 border border-sand/70 bg-sand/10 text-sand pl-3.5 pr-4 py-2.5 -mr-1 transition-colors duration-300 active:bg-sand active:text-ink"
       aria-label="Open menu"
       aria-expanded="false"
       aria-controls="mobile-menu"
     >
-      <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" aria-hidden="true">
-        <path d="M3 6h18M3 12h18M3 18h18" stroke-linecap="round"></path>
-      </svg>
+      <span class="burger" aria-hidden="true">
+        <span></span>
+        <span></span>
+        <span></span>
+      </span>
+      <span class="text-[0.72rem] font-semibold uppercase tracking-[0.18em]">Menu</span>
     </button>
   </nav>
 
@@ -60,25 +75,28 @@ const isActive = (href: string) => path === href || path.startsWith(`${href}/`);
     id="mobile-menu"
     class="md:hidden overflow-hidden max-h-0 transition-[max-height] duration-500 ease-out bg-ink/98 backdrop-blur border-t border-white/5"
   >
-    <div class="px-6 py-6 flex flex-col gap-5">
+    <div class="px-6 pt-3 pb-7 flex flex-col">
       {
         mainNav.map((l) => (
           <a
             href={l.href}
             aria-current={isActive(l.href) ? 'page' : undefined}
             class:list={[
-              'text-sm tracking-[0.18em] uppercase transition-colors',
-              isActive(l.href) ? 'text-sand' : 'text-warm-gray/85 hover:text-sand',
+              'flex items-center justify-between gap-4 border-b border-white/10 py-4 font-display text-xl tracking-wide transition-colors',
+              isActive(l.href) ? 'text-sand' : 'text-warm-gray hover:text-sand',
             ]}
             data-close
           >
             {l.label}
+            <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="text-sand/60" aria-hidden="true">
+              <path d="M5 12h14M13 6l6 6-6 6" stroke-linecap="round" stroke-linejoin="round" />
+            </svg>
           </a>
         ))
       }
       <a
         href="/quote"
-        class="text-sm tracking-[0.18em] uppercase font-semibold text-ink bg-sand px-5 py-3 text-center"
+        class="mt-6 text-sm tracking-[0.18em] uppercase font-semibold text-ink bg-sand px-5 py-4 text-center"
         data-close
       >
         Request a Quote
@@ -87,18 +105,60 @@ const isActive = (href: string) => path === href || path.startsWith(`${href}/`);
   </div>
 </header>
 
+<style>
+  .burger {
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    width: 1.15rem;
+    height: 0.85rem;
+  }
+  .burger span {
+    display: block;
+    height: 2px;
+    width: 100%;
+    background-color: currentColor;
+    transition:
+      transform 0.35s var(--ease-out-expo),
+      opacity 0.2s;
+  }
+
+  /* Open state folds the bars into a cross, so the same control closes it. */
+  #menu-toggle[aria-expanded='true'] {
+    background-color: var(--color-sand);
+    color: var(--color-ink);
+  }
+  #menu-toggle[aria-expanded='true'] .burger span:nth-child(1) {
+    transform: translateY(0.415rem) rotate(45deg);
+  }
+  #menu-toggle[aria-expanded='true'] .burger span:nth-child(2) {
+    opacity: 0;
+  }
+  #menu-toggle[aria-expanded='true'] .burger span:nth-child(3) {
+    transform: translateY(-0.415rem) rotate(-45deg);
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .burger span {
+      transition: none;
+    }
+  }
+</style>
+
 <script>
   const nav = document.getElementById('site-nav');
-  const SOLID = ['bg-ink/90', 'backdrop-blur-md', 'border-white/5', 'shadow-[0_10px_40px_-20px_rgba(0,0,0,0.8)]'];
+  // The bar now carries a translucent ground at rest too, so this only
+  // deepens it — it is no longer the difference between visible and invisible.
+  const SOLID = ['bg-ink/95', 'backdrop-blur-md', 'shadow-[0_10px_40px_-20px_rgba(0,0,0,0.8)]'];
 
   const onScroll = () => {
     if (!nav) return;
     if (window.scrollY > 24) {
       nav.classList.add(...SOLID);
-      nav.classList.remove('border-transparent');
+      nav.classList.remove('bg-ink/45');
     } else {
       nav.classList.remove(...SOLID);
-      nav.classList.add('border-transparent');
+      nav.classList.add('bg-ink/45');
     }
   };
   window.addEventListener('scroll', onScroll, { passive: true });

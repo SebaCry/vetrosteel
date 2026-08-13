@@ -2,11 +2,23 @@
 interface Props {
   variant?: 'full' | 'mark';
   tone?: 'light' | 'dark';
+  /**
+   * Height utilities. Passed separately from `class` because Tailwind orders
+   * conflicting utilities by its own sort, not by attribute order — a caller
+   * writing `class="h-14"` lost to a hardcoded `h-40` here, which is what made
+   * the fixed header 174px tall on phones.
+   */
+  size?: string;
   class?: string;
 }
-const { variant = 'full', tone = 'light', class: className = '' } = Astro.props;
+const {
+  variant = 'full',
+  tone = 'light',
+  size,
+  class: className = '',
+} = Astro.props;
 
-const sizeClass = variant === 'full' ? 'h-40 sm:h-40 w-auto' : 'h-16 w-16';
+const sizeClass = size ?? (variant === 'full' ? 'h-40 w-auto' : 'h-16 w-16');
 const toneClass = tone === 'light' ? 'brightness-0 invert' : 'brightness-100';
 ---
 

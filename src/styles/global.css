@@ -25,6 +25,11 @@
 /* ------------------------------------------------------------------ */
 html {
   -webkit-text-size-adjust: 100%;
+  /* `clip` rather than `hidden`: it stops sideways scroll without turning the
+     root into a scroll container, so the fixed header and any sticky element
+     keep working. `overflow-x: hidden` on body alone still let the viewport
+     report a couple of stray pixels at the md breakpoint. */
+  overflow-x: clip;
 }
 
 /* Native smooth scroll is the fallback; once Lenis is driving, it must not

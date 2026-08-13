@@ -16,9 +16,28 @@ interface Props {
   watermark?: boolean;
   ratio?: string;
   class?: string;
+  /**
+   * Playback window in seconds. The source files are all 10s and only their
+   * opening seconds are usable, so playback is fenced to [start, end) and
+   * loops inside it. No re-encode: the media fragment lets the browser
+   * range-request roughly the part we actually play.
+   */
+  start?: number;
+  end?: number;
 }
 
-const { slug, title, watermark = false, ratio = 'aspect-video', class: className = '' } = Astro.props;
+const {
+  slug,
+  title,
+  watermark = false,
+  ratio = 'aspect-video',
+  class: className = '',
+  start,
+  end,
+} = Astro.props;
+
+const trimmed = typeof start === 'number' && typeof end === 'number' && end > start;
+const src = trimmed ? `/video/${slug}.mp4#t=${start},${end}` : `/video/${slug}.mp4`;
 
 const posterKey = `posters/${slug}.jpg`;
 const poster = hasAsset(posterKey)
@@ -29,10 +48,12 @@ const poster = hasAsset(posterKey)
 <div class={`clip relative overflow-hidden bg-ink ${ratio} ${className}`} data-clip>
   <video
     class="absolute inset-0 w-full h-full object-cover"
-    data-src={`/video/${slug}.mp4`}
+    data-src={src}
+    data-start={trimmed ? start : undefined}
+    data-end={trimmed ? end : undefined}
     poster={poster}
     muted
-    loop
+    loop={!trimmed}
     playsinline
     preload="none"
     disablepictureinpicture
@@ -139,11 +160,37 @@ const poster = hasAsset(posterKey)
     /** Set by the user; once they take control, the observer stops overriding. */
     let manual = false;
 
+    const start = Number(video.dataset.start ?? NaN);
+    const end = Number(video.dataset.end ?? NaN);
+    const trimmed = Number.isFinite(start) && Number.isFinite(end);
+
     const load = () => {
       if (loaded) return;
       loaded = true;
       video.src = video.dataset.src!;
     };
+
+    if (trimmed) {
+      // The `#t=` fragment already seeks and stops, but browsers disagree on
+      // whether it fires `ended` or just pauses, and Safari overshoots a little.
+      // Owning the loop here makes all of them behave the same.
+      const rewind = () => {
+        if (video.currentTime < start - 0.05 || video.currentTime >= end) {
+          video.currentTime = start;
+        }
+      };
+      video.addEventListener('loadedmetadata', rewind);
+      video.addEventListener('timeupdate', () => {
+        if (video.currentTime >= end) {
+          video.currentTime = start;
+          if (video.paused && !manual) video.play().catch(() => {});
+        }
+      });
+      video.addEventListener('ended', () => {
+        video.currentTime = start;
+        if (!manual) video.play().catch(() => {});
+      });
+    }
 
     const syncIcons = () => {
       const playing = !video.paused && !video.ended;

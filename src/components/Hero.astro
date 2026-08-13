@@ -2,6 +2,12 @@
 import { Image } from 'astro:assets';
 import { site } from '../data/site';
 import { asset } from '../lib/images';
+import ClipPlayer from './ui/ClipPlayer.astro';
+import { transitions } from '../data/showcase';
+
+// The split-screen elevation → façade clip: it states the offer without a
+// caption, which is exactly what the hero needs.
+const demo = transitions[0];
 
 // Radiating "cable" lines — evokes the cable-stayed bridge of the brand deck
 // and the vanishing-point perspective of a technical drawing.
@@ -71,14 +77,20 @@ const rays = Array.from({ length: 26 }, (_, i) => {
     <div class="absolute inset-x-0 bottom-0 h-40" style="background:linear-gradient(to top,#071e24, transparent);"></div>
   </div>
 
-  <div class="mx-auto max-w-7xl w-full px-5 sm:px-8 pt-28 pb-20">
-    <div class="max-w-3xl">
+  <div class="mx-auto max-w-7xl w-full px-5 sm:px-8 pt-36 sm:pt-32 lg:pt-28 pb-24 sm:pb-20 grid lg:grid-cols-12 lg:gap-12 xl:gap-16 lg:items-center">
+    <!-- Text and clip share the same 12 columns, so their spans have to add up
+         to 12 or the second one wraps. The clip takes half at lg and the larger
+         half from xl, where there is room to narrow the copy without breaking
+         the headline. -->
+    <div class="lg:col-span-6 xl:col-span-5 max-w-3xl">
       <p class="eyebrow text-light-teal mb-7 flex items-center gap-3" data-reveal>
         <span class="inline-block w-9 h-px bg-sand"></span>
         {site.tagline}
       </p>
 
-      <h1 class="font-display font-semibold text-warm-gray leading-[1.05] text-5xl sm:text-6xl lg:text-7xl" data-reveal style="--reveal-delay:80ms">
+      <!-- Drops a step at lg: the copy column is narrowest there, and
+           "Precision." at text-7xl overflows it. -->
+      <h1 class="font-display font-semibold text-warm-gray leading-[1.05] text-5xl sm:text-6xl lg:text-6xl xl:text-7xl" data-reveal style="--reveal-delay:80ms">
         Precision.<br />
         <span class="text-sand">Strength.</span><br />
         Elegance.
@@ -108,6 +120,44 @@ const rays = Array.from({ length: 26 }, (_, i) => {
           Request a quote
         </a>
       </div>
+    </div>
+
+    <!-- Demo clip. Deliberately beside the headline rather than behind it: the
+         H1 stays the LCP element, and the clip is lazy like every other one, so
+         the fold still paints from text + poster alone. -->
+    <div class="lg:col-span-6 xl:col-span-7 mt-14 lg:mt-0" data-reveal style="--reveal-delay:420ms">
+      <figure class="relative">
+        <div class="tick-frame p-2.5">
+          <ClipPlayer
+            slug={demo.slug}
+            title={demo.title}
+            watermark={demo.watermark}
+            start={demo.start}
+            end={demo.end}
+          />
+        </div>
+
+        <div class="absolute inset-x-2.5 top-2.5 flex items-center justify-between p-3 pointer-events-none">
+          <span class="bg-ink/80 backdrop-blur-sm px-2.5 py-1.5 text-[0.58rem] uppercase tracking-[0.2em] text-warm-gray/85">
+            {demo.before}
+          </span>
+          <span class="bg-sand/90 px-2.5 py-1.5 text-[0.58rem] uppercase tracking-[0.2em] text-ink font-semibold">
+            {demo.after}
+          </span>
+        </div>
+
+        <figcaption class="mt-4 flex items-baseline justify-between gap-4">
+          <a
+            href="/projects"
+            class="group inline-flex items-center gap-1.5 text-[0.72rem] font-semibold uppercase tracking-[0.16em] text-sand border-b border-sand/30 hover:border-sand pb-0.5 transition-colors"
+          >
+            See the work
+            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" class="transition-transform duration-300 group-hover:translate-x-1" aria-hidden="true">
+              <path d="M5 12h14M13 6l6 6-6 6" stroke-linecap="round" stroke-linejoin="round"></path>
+            </svg>
+          </a>
+        </figcaption>
+      </figure>
     </div>
   </div>
 

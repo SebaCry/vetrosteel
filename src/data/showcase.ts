@@ -7,7 +7,7 @@
  * drawing to finished work; they are NOT footage of completed Vetro Steel
  * installations, and the UI labels them as visualisations for that reason.
  *
- * `projects` is the opposite: 21 photographs of real, completed installations.
+ * `projects` is the opposite: photographs of real, completed installations.
  * That is the section that carries the evidence.
  */
 
@@ -25,6 +25,20 @@ export interface Clip {
    * of them and doubles as consistent branding.
    */
   watermark: boolean;
+  /**
+   * Playback window, in seconds. Every source clip is exactly 10s, and every
+   * one of them degrades in its back half: the generator hallucinates spec
+   * labels that read as gibberish ("STAIPLEED GLA", "OLA'L STAINLESS STEEL
+   * FIXINGS", "STANIEGS 304"), leaks filenames ("image_3.png") and even the
+   * typeface name ("Montserrat") into callouts, mixes Spanish into an English
+   * site, and closes on a generated brand card.
+   *
+   * So these windows are not only about length — the opening seconds are the
+   * only publishable part. Each one is cut to end before its first bad frame,
+   * which is why they land at 3.6-5.6s rather than a round number.
+   */
+  start: number;
+  end: number;
 }
 
 export interface Stage extends Clip {
@@ -46,6 +60,10 @@ export const stages: Stage[] = [
     title: 'Set out on plan',
     note: 'Openings, swings and glass runs are fixed on the floor plan before a single panel is cut.',
     watermark: true,
+    // Plan, then the built partitions. Cuts at 4.0: the callouts that follow
+    // read "SAFET" and "image_3.png".
+    start: 0.15,
+    end: 4.0,
   },
   {
     step: '02',
@@ -56,6 +74,10 @@ export const stages: Stage[] = [
     // rather than quoting a dimension that is only on screen for a moment.
     note: 'Anchors and accessories are called out as they go in — size, length and the finish code.',
     watermark: true,
+    // Anchor, accessory and glass callouts — the one clip whose labels stay
+    // legible. Cuts before the generated brand card.
+    start: 0.0,
+    end: 5.4,
   },
   {
     step: '03',
@@ -64,6 +86,9 @@ export const stages: Stage[] = [
     title: 'Set, levelled, adjusted',
     note: 'Panels clamped and levelled until the joint lines run true. At this scale the joint is the finish.',
     watermark: true,
+    // No overlaid text at all: wide room pushing in to the clamp detail.
+    start: 0.0,
+    end: 5.6,
   },
 ];
 
@@ -76,6 +101,10 @@ export const transitions: Transition[] = [
     before: 'Elevation',
     after: 'Built',
     watermark: true,
+    // Split drawing/facade, then the facade clean. Cuts before the callouts
+    // start dropping characters.
+    start: 0.0,
+    end: 4.4,
   },
   {
     slug: 'elevation-to-portico',
@@ -84,6 +113,10 @@ export const transitions: Transition[] = [
     before: 'Framing plan',
     after: 'Built',
     watermark: true,
+    // Cuts at 4.6: at 5.7 the clip draws red X marks over its own callouts
+    // and the labels switch to Spanish.
+    start: 0.0,
+    end: 4.6,
   },
 ];
 
@@ -94,18 +127,26 @@ export const spaces: Clip[] = [
     title: 'Mezzanine guardrail',
     note: 'Frameless glass guardrail with a continuous stainless top rail.',
     watermark: true,
+    start: 0.0,
+    end: 4.0,
   },
   {
     slug: 'stair-railing-office',
     title: 'Stair and landing',
     note: 'Handrail returning into the landing balustrade without a visible joint.',
     watermark: true,
+    start: 0.0,
+    end: 4.0,
   },
   {
     slug: 'office-partitions-run',
     title: 'Workstation partitions',
     note: 'A run of low glass divisions on a shared aluminium base channel.',
     watermark: true,
+    // Only the first few seconds survive: by 4.3 the labels read "STAIPLEED
+    // GLA" and the exploded view is annotated "Montserrat".
+    start: 0.0,
+    end: 3.6,
   },
 ];
 
@@ -115,29 +156,38 @@ export interface Project {
   note: string;
 }
 
-/** Photographs of completed installations. Real work, real sites. */
+/**
+ * Photographs of completed installations. Real work, real sites.
+ *
+ * Cut from 21 to 10. The files for the other eleven are still in
+ * src/assets/projects — nothing was deleted, so putting one back is a single
+ * line here. They were dropped for these reasons:
+ *
+ *   terrace-railing-restaurant  a McDonald's sign dominates the frame
+ *   steel-timber-cross          a wall crucifix; nothing to do with the offer
+ *   gym-stainless-frames (+ -2) exercise-bike frames, off-message for glazing
+ *   steel-bench-orange          orange powder-coat, fights the palette
+ *   clinic-glass-screen         640x480, heavy green cast, shows a dental chair
+ *   clinic-partition-blue       720x480, cluttered, glass barely reads
+ *   display-case-glass          640x853, flat light, packing box in shot
+ *   facade-balcony-railing      639x428, too small to enlarge
+ *   stair-handrail-interior     shot upward mid-works, reads unfinished
+ *   pavilion-glass-balustrade-2 same run, weaker angle than the one kept
+ *
+ * The keepers are the ones that are both sharp enough to enlarge and show the
+ * glass-and-stainless work as the subject rather than the background.
+ */
 export const projects: Project[] = [
-  { image: 'projects/pavilion-glass-balustrade.jpg', label: 'Pavilion Balustrade', note: 'Glass guardrail on a steel frame, set over a rendered base wall.' },
-  { image: 'projects/pavilion-glass-balustrade-2.jpg', label: 'Pavilion, Corner Return', note: 'The same run turning the corner with a mitred cap rail.' },
-  { image: 'projects/rooftop-railing-city.jpg', label: 'Rooftop Terrace', note: 'Post-and-glass guardrail on an exposed city terrace.' },
-  { image: 'projects/terrace-railing-bar.jpg', label: 'Terrace Railing', note: 'Stainless posts with glass infill along a paved terrace edge.' },
-  { image: 'projects/terrace-railing-restaurant.jpg', label: 'Restaurant Terrace', note: 'Guardrail run enclosing a raised dining deck.' },
-  { image: 'projects/facade-balcony-railing.jpg', label: 'Balcony Railing', note: 'Glass balcony fronts across a commercial façade.' },
-  { image: 'projects/spiral-stair-glass.jpg', label: 'Spiral Stair', note: 'Curved glass balustrade following a helical stair.' },
-  { image: 'projects/stair-railing-timber-treads.jpg', label: 'Feature Stair', note: 'Stainless balustrade against timber treads and a steel stringer.' },
-  { image: 'projects/stair-handrail-interior.jpg', label: 'Interior Handrail', note: 'Wall-mounted stainless handrail over a stone stair.' },
   { image: 'projects/curved-glass-partition.jpg', label: 'Curved Partition', note: 'Radiused glass screen with floor and ceiling patch fixings.' },
-  { image: 'projects/clinic-partition-blue.jpg', label: 'Clinic Partition', note: 'Printed glass division between treatment bays.' },
-  { image: 'projects/clinic-glass-screen.jpg', label: 'Clinic Screen', note: 'Full-height glass screen with a stainless support post.' },
-  { image: 'projects/display-case-glass.jpg', label: 'Display Case', note: 'All-glass case assembled with concealed corner fittings.' },
   { image: 'projects/poolside-glass-railing.jpg', label: 'Poolside Guardrail', note: 'Glass guardrail on stainless posts at a pool terrace.' },
+  { image: 'projects/rooftop-railing-city.jpg', label: 'Rooftop Terrace', note: 'Post-and-glass guardrail on an exposed city terrace.' },
+  { image: 'projects/stair-railing-timber-treads.jpg', label: 'Feature Stair', note: 'Stainless balustrade against timber treads and a steel stringer.' },
   { image: 'projects/deck-railing-lakeside.jpg', label: 'Lakeside Deck', note: 'Post-mounted glass railing on a timber deck.' },
+  { image: 'projects/pavilion-glass-balustrade.jpg', label: 'Pavilion Balustrade', note: 'Glass guardrail on a steel frame, set over a rendered base wall.' },
+  { image: 'projects/spiral-stair-glass.jpg', label: 'Spiral Stair', note: 'Curved glass balustrade following a helical stair.' },
+  { image: 'projects/terrace-railing-bar.jpg', label: 'Terrace Railing', note: 'Stainless posts with glass infill along a paved terrace edge.' },
   { image: 'projects/rooftop-railing-hillside.jpg', label: 'Hillside Terrace', note: 'Slim-post glass guardrail on a hillside roof terrace.' },
-  { image: 'projects/gym-stainless-frames.jpg', label: 'Stainless Frames', note: 'Polished stainless equipment frames fabricated to drawing.' },
-  { image: 'projects/gym-stainless-frames-2.jpg', label: 'Frames, Batch', note: 'The same run before finishing and delivery.' },
-  { image: 'projects/steel-bench-orange.jpg', label: 'Steel Bench', note: 'Slatted stainless bench on a powder-coated frame.' },
   { image: 'projects/timber-door-steel-inlay.jpg', label: 'Door Inlay', note: 'Timber leaf with brushed stainless inlay and flush hardware.' },
-  { image: 'projects/steel-timber-cross.jpg', label: 'Steel & Timber', note: 'Fabricated steel connection on a laminated timber member.' },
 ];
 
 /** Generated stills. Kept separate so they are never captioned as built work. */
