@@ -24,6 +24,12 @@ interface Props {
    */
   start?: number;
   end?: number;
+  /**
+   * `card` is the framed clip used through the pages. `background` fills its
+   * container edge to edge for the hero: no frame, no ring, a larger poster,
+   * and it starts loading immediately instead of waiting to be scrolled to.
+   */
+  variant?: 'card' | 'background';
 }
 
 const {
@@ -34,20 +40,31 @@ const {
   class: className = '',
   start,
   end,
+  variant = 'card',
 } = Astro.props;
+
+const isBackground = variant === 'background';
 
 const trimmed = typeof start === 'number' && typeof end === 'number' && end > start;
 const src = trimmed ? `/video/${slug}.mp4#t=${start},${end}` : `/video/${slug}.mp4`;
 
+// The background fills the viewport, so its poster needs more pixels than a
+// card's — it is what paints before the video has a single frame decoded.
 const posterKey = `posters/${slug}.jpg`;
 const poster = hasAsset(posterKey)
-  ? (await getImage({ src: asset(posterKey), width: 1024, format: 'webp' })).src
+  ? (await getImage({ src: asset(posterKey), width: isBackground ? 1920 : 1024, format: 'webp' })).src
   : undefined;
 ---
 
-<div class={`clip relative overflow-hidden bg-ink ${ratio} ${className}`} data-clip>
+<div
+  class={`clip overflow-hidden bg-ink ${
+    isBackground ? 'absolute inset-0' : `relative ${ratio}`
+  } ${className}`}
+  data-clip
+  data-eager={isBackground ? '' : undefined}
+>
   <video
-    class="absolute inset-0 w-full h-full object-cover"
+    class:list={['absolute inset-0 w-full h-full object-cover', isBackground && 'clip-bg']}
     data-src={src}
     data-start={trimmed ? start : undefined}
     data-end={trimmed ? end : undefined}
@@ -69,12 +86,12 @@ const poster = hasAsset(posterKey)
     )
   }
 
-  <div class="absolute inset-0 ring-1 ring-inset ring-white/10 pointer-events-none"></div>
+  {!isBackground && <div class="absolute inset-0 ring-1 ring-inset ring-white/10 pointer-events-none" />}
 
   <button
     type="button"
     data-clip-toggle
-    class="clip-toggle absolute left-3 bottom-3 z-20"
+    class={`clip-toggle absolute z-20 ${isBackground ? 'right-3 top-3' : 'left-3 bottom-3'}`}
     aria-label={`Play ${title}`}
     aria-pressed="false"
   >
@@ -116,6 +133,35 @@ const poster = hasAsset(posterKey)
     opacity: 0.92;
   }
 
+  /* The generated sparkle sits at roughly 86-91% across and 81-89% down. As a
+     full-bleed backdrop it is plainly visible, and a badge big enough to cover
+     it would dominate the hero — so the frame is scaled from its top-left
+     corner until that corner falls outside the box and gets clipped. */
+  .clip-bg {
+    /* A continuous push-in can never cut back to its first frame cleanly, so
+       the last moments dissolve through the backdrop instead. */
+    transition: opacity 0.45s linear;
+  }
+
+  /* Only wide viewports need the crop. On anything narrower, object-cover has
+     already thrown away the outer thirds of a 16:9 frame, so the sparkle is
+     gone on its own and scaling would just cost resolution. */
+  @media (min-width: 1024px) {
+    .clip-bg {
+      transform: scale(1.22);
+      transform-origin: left top;
+    }
+  }
+  [data-eager][data-looping='true'] .clip-bg {
+    opacity: 0;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .clip-bg {
+      transition: none;
+    }
+  }
+
   .clip-toggle {
     display: inline-flex;
     align-items: center;
@@ -131,6 +177,14 @@ const poster = hasAsset(posterKey)
   }
   .clip:hover .clip-toggle,
   .clip-toggle:focus-visible {
+    opacity: 1;
+  }
+  /* Looping motion behind the hero headline has to be pausable without
+     hunting for it (WCAG 2.2.2), and there is no hover on a phone. */
+  [data-eager] .clip-toggle {
+    opacity: 0.55;
+  }
+  [data-eager]:hover .clip-toggle {
     opacity: 1;
   }
   .clip-toggle:hover {
@@ -180,9 +234,13 @@ const poster = hasAsset(posterKey)
         }
       };
       video.addEventListener('loadedmetadata', rewind);
+      const FADE = 0.45;
       video.addEventListener('timeupdate', () => {
+        // Dip out just before the wrap so the jump back reads as a dissolve.
+        root.dataset.looping = video.currentTime >= end - FADE ? 'true' : 'false';
         if (video.currentTime >= end) {
           video.currentTime = start;
+          root.dataset.looping = 'false';
           if (video.paused && !manual) video.play().catch(() => {});
         }
       });
@@ -215,6 +273,12 @@ const poster = hasAsset(posterKey)
         video.pause();
       }
     });
+
+    const eager = root.hasAttribute('data-eager');
+    if (eager) {
+      load();
+      if (!reduced.matches) video.play().catch(() => {});
+    }
 
     if ('IntersectionObserver' in window) {
       const io = new IntersectionObserver(

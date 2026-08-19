@@ -242,16 +242,6 @@ export const commercial: Vertical = {
   ],
   gallery: [
     {
-      image: 'scenes/storefront-entrance.jpg',
-      label: 'Storefront Entrance',
-      note: 'Full-height glazed entrance with stainless patch fittings.',
-    },
-    {
-      image: 'scenes/office-glass-doors.jpg',
-      label: 'Office Partition',
-      note: 'Glazed office division with framed door leaves.',
-    },
-    {
       image: 'scenes/curtain-wall-facade.jpg',
       label: 'Curtain Wall',
       note: 'Structural glass envelope over a steel frame.',
@@ -262,9 +252,9 @@ export const commercial: Vertical = {
       note: 'Framed glass roof engineered for light and load.',
     },
     {
-      image: 'scenes/railing-exterior-stair.jpg',
-      label: 'Exterior Stair Railing',
-      note: 'Frameless glass guardrail with brass handrail.',
+      image: 'scenes/glass-roof-structure.jpg',
+      label: 'Glass Roof Structure',
+      note: 'Spider-fixed glazing over a steel space frame.',
     },
     {
       image: 'scenes/railing-glass-brass.jpg',
@@ -477,19 +467,9 @@ export const residential: Vertical = {
       note: 'Bath screen with brass track and brackets.',
     },
     {
-      image: 'scenes/bath-fixed-panel.jpg',
-      label: 'Fixed Panel',
-      note: 'Frameless return panel, clamped top and bottom.',
-    },
-    {
-      image: 'scenes/shower-marble-sliding.jpg',
-      label: 'Sliding Over Stone',
-      note: 'Black hardware against full-height marble.',
-    },
-    {
-      image: 'scenes/shower-enclosure-stone.jpg',
-      label: 'Corner Enclosure',
-      note: 'Two-panel corner with a glass-to-glass hinge.',
+      image: 'scenes/bath-tub-screen-brass.jpg',
+      label: 'Over-Bath Screen, Brass',
+      note: 'Sliding bath screen on a brass track, against full-height tile.',
     },
   ],
   cta: {

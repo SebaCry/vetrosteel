@@ -1,13 +1,29 @@
 ---
-import { Image } from 'astro:assets';
 import { site } from '../data/site';
-import { asset } from '../lib/images';
 import ClipPlayer from './ui/ClipPlayer.astro';
-import { transitions } from '../data/showcase';
+import { stages } from '../data/showcase';
 
-// The split-screen elevation → façade clip: it states the offer without a
-// caption, which is exactly what the hero needs.
-const demo = transitions[0];
+// Background clip. `office-glass-suite` is the only one with no burnt-in
+// callouts and a single continuous camera move, which is what a backdrop
+// needs — the split-screen drawing clips have a white half that would sit
+// straight under the headline. Swapping this for the client's new clip is a
+// one-line change once the file lands in public/video.
+const bg = stages[2];
+
+// The hero runs a tighter window than the card on /projects. The clip is one
+// long push-in: it opens on a near-empty dark room and ends in a macro so close
+// it stops reading as glass. Only the middle stretch works as a backdrop.
+const bgStart = 1.8;
+const bgEnd = 5.0;
+
+// The offer, said plainly and rotated. This is the "what do they actually
+// sell" line: a visitor should know inside two seconds.
+const offers = [
+  'office partitions',
+  'a stainless handrail',
+  'a shower enclosure',
+  'a storefront entrance',
+];
 
 // Radiating "cable" lines — evokes the cable-stayed bridge of the brand deck
 // and the vanishing-point perspective of a technical drawing.
@@ -35,21 +51,18 @@ const rays = Array.from({ length: 26 }, (_, i) => {
         radial-gradient(110% 95% at 68% 0%, #1a5563 0%, #0e3742 42%, #071e24 100%);"
     >
     </div>
-    <!-- architectural backdrop: glass towers converging up, tinted to the teal
-         and aligned with the cables' vanishing point -->
-    <Image
-      src={asset('scenes/curtain-wall-facade.jpg')}
-      alt=""
-      aria-hidden="true"
-      widths={[800, 1280, 1800]}
-      sizes="100vw"
-      loading="eager"
-      decoding="sync"
-      fetchpriority="high"
-      class="absolute inset-0 w-full h-full object-cover duotone opacity-[0.35] mix-blend-luminosity"
-      style="object-position: 62% top;"
+    <!-- The clip is the backdrop. Its poster paints first, so the fold never
+         waits on video bytes. -->
+    <ClipPlayer
+      slug={bg.slug}
+      title={bg.title}
+      start={bgStart}
+      end={bgEnd}
+      variant="background"
+      class="absolute inset-0 opacity-70"
     />
-    <div class="absolute inset-0 blueprint-grid opacity-70"></div>
+
+    <div class="absolute inset-0 blueprint-grid opacity-40"></div>
 
     <svg
       class="absolute inset-0 w-full h-full"
@@ -63,7 +76,7 @@ const rays = Array.from({ length: 26 }, (_, i) => {
           stroke={r.strong ? '#d9c39c' : '#a7c4c9'}
           stroke-width={r.strong ? 2 : 1}
           vector-effect="non-scaling-stroke"
-          opacity={r.strong ? 0.85 : 0.5}
+          opacity={r.strong ? 0.5 : 0.28}
           class="ray"
           style={`--i:${i}`}
         />
@@ -73,37 +86,60 @@ const rays = Array.from({ length: 26 }, (_, i) => {
     </svg>
 
     <!-- vignette for legibility -->
-    <div class="absolute inset-0" style="background:linear-gradient(90deg, rgba(7,30,36,0.92) 0%, rgba(7,30,36,0.72) 34%, rgba(7,30,36,0.22) 62%, transparent 82%);"></div>
+    <div class="hero-scrim absolute inset-0"></div>
     <div class="absolute inset-x-0 bottom-0 h-40" style="background:linear-gradient(to top,#071e24, transparent);"></div>
   </div>
 
-  <div class="mx-auto max-w-7xl w-full px-5 sm:px-8 pt-36 sm:pt-32 lg:pt-28 pb-24 sm:pb-20 grid lg:grid-cols-12 lg:gap-12 xl:gap-16 lg:items-center">
-    <!-- Text and clip share the same 12 columns, so their spans have to add up
-         to 12 or the second one wraps. The clip takes half at lg and the larger
-         half from xl, where there is room to narrow the copy without breaking
-         the headline. -->
-    <div class="lg:col-span-6 xl:col-span-5 max-w-3xl">
+  <div class="mx-auto max-w-7xl w-full px-5 sm:px-8 pt-36 sm:pt-32 lg:pt-28 pb-28 sm:pb-24">
+    <div class="max-w-3xl">
       <p class="eyebrow text-light-teal mb-7 flex items-center gap-3" data-reveal>
         <span class="inline-block w-9 h-px bg-sand"></span>
         {site.tagline}
       </p>
 
-      <!-- Drops a step at lg: the copy column is narrowest there, and
-           "Precision." at text-7xl overflows it. -->
-      <h1 class="font-display font-semibold text-warm-gray leading-[1.05] text-5xl sm:text-6xl lg:text-6xl xl:text-7xl" data-reveal style="--reveal-delay:80ms">
+      <h1
+        class="font-display font-semibold text-warm-gray leading-[1.05] text-5xl sm:text-6xl lg:text-7xl"
+        data-reveal
+        style="--reveal-delay:80ms"
+      >
         Precision.<br />
         <span class="text-sand">Strength.</span><br />
         Elegance.
       </h1>
 
-      <p class="mt-8 max-w-xl text-base sm:text-lg leading-relaxed text-warm-gray/75" data-reveal style="--reveal-delay:200ms">
+      <!-- The offer, in the plainest words available. The rotating half is
+           aria-hidden and the full list is read out once instead. -->
+      <p
+        class="mt-9 font-display text-xl sm:text-2xl lg:text-[1.75rem] leading-snug text-warm-gray"
+        data-reveal
+        style="--reveal-delay:170ms"
+      >
+        <span aria-hidden="true">
+          Need <span class="rotator" data-rotator>
+            {offers.map((o, i) => (
+              <span class:list={['rot-item', i === 0 && 'is-active']}>{o}?</span>
+            ))}
+          </span><br class="hidden sm:block" />
+          <span class="text-sand">We draw it, fabricate it and install it.</span>
+        </span>
+        <span class="sr-only">
+          Need office partitions, a stainless handrail, a shower enclosure or a
+          storefront entrance? We draw it, fabricate it and install it.
+        </span>
+      </p>
+
+      <p
+        class="mt-7 max-w-xl text-base sm:text-lg leading-relaxed text-warm-gray/75"
+        data-reveal
+        style="--reveal-delay:250ms"
+      >
         Shower enclosures, sliding systems, railings and entrance systems in
         tempered glass and stainless steel — specified from our own hardware
         catalog, cut to dimensioned templates, and installed by the people who
         drew them.
       </p>
 
-      <div class="mt-10 flex flex-col sm:flex-row gap-4" data-reveal style="--reveal-delay:320ms">
+      <div class="mt-10 flex flex-col sm:flex-row gap-4" data-reveal style="--reveal-delay:340ms">
         <a
           href="#verticals"
           class="group inline-flex items-center justify-center gap-2 bg-sand text-ink font-semibold uppercase tracking-[0.14em] text-[0.82rem] px-7 py-4 hover:bg-sand-bright transition-colors duration-300"
@@ -121,44 +157,6 @@ const rays = Array.from({ length: 26 }, (_, i) => {
         </a>
       </div>
     </div>
-
-    <!-- Demo clip. Deliberately beside the headline rather than behind it: the
-         H1 stays the LCP element, and the clip is lazy like every other one, so
-         the fold still paints from text + poster alone. -->
-    <div class="lg:col-span-6 xl:col-span-7 mt-14 lg:mt-0" data-reveal style="--reveal-delay:420ms">
-      <figure class="relative">
-        <div class="tick-frame p-2.5">
-          <ClipPlayer
-            slug={demo.slug}
-            title={demo.title}
-            watermark={demo.watermark}
-            start={demo.start}
-            end={demo.end}
-          />
-        </div>
-
-        <div class="absolute inset-x-2.5 top-2.5 flex items-center justify-between p-3 pointer-events-none">
-          <span class="bg-ink/80 backdrop-blur-sm px-2.5 py-1.5 text-[0.58rem] uppercase tracking-[0.2em] text-warm-gray/85">
-            {demo.before}
-          </span>
-          <span class="bg-sand/90 px-2.5 py-1.5 text-[0.58rem] uppercase tracking-[0.2em] text-ink font-semibold">
-            {demo.after}
-          </span>
-        </div>
-
-        <figcaption class="mt-4 flex items-baseline justify-between gap-4">
-          <a
-            href="/projects"
-            class="group inline-flex items-center gap-1.5 text-[0.72rem] font-semibold uppercase tracking-[0.16em] text-sand border-b border-sand/30 hover:border-sand pb-0.5 transition-colors"
-          >
-            See the work
-            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" class="transition-transform duration-300 group-hover:translate-x-1" aria-hidden="true">
-              <path d="M5 12h14M13 6l6 6-6 6" stroke-linecap="round" stroke-linejoin="round"></path>
-            </svg>
-          </a>
-        </figcaption>
-      </figure>
-    </div>
   </div>
 
   <!-- bottom credential strip -->
@@ -175,6 +173,64 @@ const rays = Array.from({ length: 26 }, (_, i) => {
 </section>
 
 <style>
+  /* The copy sits in the left third on a wide screen, so the wash runs
+     sideways there. On a phone the copy spans the full width, and that same
+     wash simply blacked the clip out — so it flips to a gentler vertical one. */
+  .hero-scrim {
+    background:
+      linear-gradient(
+        to bottom,
+        rgba(7, 30, 36, 0.78) 0%,
+        rgba(7, 30, 36, 0.52) 40%,
+        rgba(7, 30, 36, 0.88) 100%
+      );
+  }
+  @media (min-width: 1024px) {
+    .hero-scrim {
+      background:
+        linear-gradient(
+          90deg,
+          rgba(7, 30, 36, 0.95) 0%,
+          rgba(7, 30, 36, 0.86) 30%,
+          rgba(7, 30, 36, 0.55) 58%,
+          rgba(7, 30, 36, 0.28) 100%
+        ),
+        linear-gradient(
+          to bottom,
+          rgba(7, 30, 36, 0.5) 0%,
+          rgba(7, 30, 36, 0.08) 38%,
+          rgba(7, 30, 36, 0.35) 100%
+        );
+    }
+  }
+
+  /* inline-grid stacks every option in one cell, so the line is sized by the
+     longest term and nothing reflows as they swap. */
+  .rotator {
+    display: inline-grid;
+    vertical-align: bottom;
+  }
+  .rot-item {
+    grid-area: 1 / 1;
+    white-space: nowrap;
+    color: var(--color-sand);
+    opacity: 0;
+    transform: translateY(0.3em);
+    transition:
+      opacity 0.5s var(--ease-out-expo),
+      transform 0.5s var(--ease-out-expo);
+  }
+  .rot-item.is-active {
+    opacity: 1;
+    transform: none;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .rot-item {
+      transition: none;
+    }
+  }
+
   @keyframes ray-in {
     from { opacity: 0; }
   }
@@ -188,3 +244,34 @@ const rays = Array.from({ length: 26 }, (_, i) => {
     .ray { animation: none; }
   }
 </style>
+
+<script>
+  // Rotates the offer term. Frozen under reduced motion and while the tab is
+  // hidden, so it is not animating for nobody.
+  const rotator = document.querySelector<HTMLElement>('[data-rotator]');
+  if (rotator) {
+    const items = Array.from(rotator.querySelectorAll<HTMLElement>('.rot-item'));
+    const reduced = window.matchMedia('(prefers-reduced-motion: reduce)');
+    let i = 0;
+    let timer: number | undefined;
+
+    const step = () => {
+      items[i].classList.remove('is-active');
+      i = (i + 1) % items.length;
+      items[i].classList.add('is-active');
+    };
+
+    const start = () => {
+      if (timer || reduced.matches || items.length < 2) return;
+      timer = window.setInterval(step, 2600);
+    };
+    const stop = () => {
+      if (timer) window.clearInterval(timer);
+      timer = undefined;
+    };
+
+    start();
+    document.addEventListener('visibilitychange', () => (document.hidden ? stop() : start()));
+    reduced.addEventListener('change', () => (reduced.matches ? stop() : start()));
+  }
+</script>

@@ -184,7 +184,6 @@ export const projects: Project[] = [
   { image: 'projects/stair-railing-timber-treads.jpg', label: 'Feature Stair', note: 'Stainless balustrade against timber treads and a steel stringer.' },
   { image: 'projects/deck-railing-lakeside.jpg', label: 'Lakeside Deck', note: 'Post-mounted glass railing on a timber deck.' },
   { image: 'projects/pavilion-glass-balustrade.jpg', label: 'Pavilion Balustrade', note: 'Glass guardrail on a steel frame, set over a rendered base wall.' },
-  { image: 'projects/spiral-stair-glass.jpg', label: 'Spiral Stair', note: 'Curved glass balustrade following a helical stair.' },
   { image: 'projects/terrace-railing-bar.jpg', label: 'Terrace Railing', note: 'Stainless posts with glass infill along a paved terrace edge.' },
   { image: 'projects/rooftop-railing-hillside.jpg', label: 'Hillside Terrace', note: 'Slim-post glass guardrail on a hillside roof terrace.' },
   { image: 'projects/timber-door-steel-inlay.jpg', label: 'Door Inlay', note: 'Timber leaf with brushed stainless inlay and flush hardware.' },

@@ -17,14 +17,11 @@ import { commercial, residential } from '../data/verticals';
  * what backs the work, a sample of it, and one way to start a conversation.
  * Mission / Vision / Values now live on /about.
  */
-const featured = [
-  commercial.gallery[0],
-  residential.gallery[0],
-  commercial.gallery[4],
-  residential.gallery[1],
-  commercial.gallery[1],
-  residential.gallery[2],
-];
+// Alternates the two lines rather than indexing fixed positions: hard-coded
+// indices broke the build the moment a gallery got shorter.
+const featured = Array.from({ length: 3 }, (_, i) => [commercial.gallery[i], residential.gallery[i]])
+  .flat()
+  .filter((item) => item !== undefined);
 ---
 
 <Layout>
