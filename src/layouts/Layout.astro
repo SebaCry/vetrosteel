@@ -5,19 +5,19 @@ import '@fontsource/cinzel/600.css';
 import '@fontsource/cinzel/700.css';
 import '@fontsource-variable/montserrat';
 import '../styles/global.css';
-import { site } from '../data/site';
+import Seo from '../components/Seo.astro';
 
 interface Props {
   title?: string;
   description?: string;
+  breadcrumbs?: { name: string; href: string }[];
+  includeFaq?: boolean;
+  noindex?: boolean;
 }
 
-const {
-  title = `${site.legalName} — ${site.tagline}`,
-  description = 'Premium glass hardware and architectural systems in tempered glass and stainless steel. Shower enclosures, sliding systems, railings, pull handles and entrance systems for commercial and residential projects. Utah, USA.',
-} = Astro.props;
-
-const canonical = Astro.site ? new URL(Astro.url.pathname, Astro.site).href : Astro.url.pathname;
+// Everything search-related is delegated to <Seo>, which falls back to the
+// route table in src/data/seo.ts when a page passes nothing.
+const { title, description, breadcrumbs, includeFaq, noindex } = Astro.props;
 ---
 
 <!doctype html>
@@ -28,19 +28,15 @@ const canonical = Astro.site ? new URL(Astro.url.pathname, Astro.site).href : As
     <link rel="icon" type="image/png" href="/logo.png" />
     <meta name="generator" content={Astro.generator} />
 
-    <title>{title}</title>
-    <meta name="description" content={description} />
-    <link rel="canonical" href={canonical} />
-    <meta name="theme-color" content="#0f3b46" />
+    <Seo
+      title={title}
+      description={description}
+      breadcrumbs={breadcrumbs}
+      includeFaq={includeFaq}
+      noindex={noindex}
+    />
 
-    <!-- Open Graph -->
-    <meta property="og:type" content="website" />
-    <meta property="og:title" content={title} />
-    <meta property="og:description" content={description} />
-    <meta property="og:url" content={canonical} />
-    <meta property="og:locale" content="en_US" />
-    <meta property="og:site_name" content={site.name} />
-    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="theme-color" content="#0f3b46" />
   </head>
   <body>
     <a

@@ -1,0 +1,42 @@
+---
+import Layout from '../layouts/Layout.astro';
+import Nav from '../components/Nav.astro';
+import Footer from '../components/Footer.astro';
+import { mainNav } from '../data/site';
+---
+
+<Layout noindex>
+  <Nav />
+  <main id="main" class="relative bg-ink text-warm-gray min-h-[70svh] flex items-center overflow-hidden">
+    <div class="absolute inset-0 blueprint-grid opacity-30"></div>
+    <div class="relative mx-auto max-w-3xl px-5 sm:px-8 py-32 text-center">
+      <p class="eyebrow text-sand mb-7">Error 404</p>
+      <h1 class="font-display font-semibold text-4xl sm:text-6xl leading-[1.08] text-warm-gray">
+        This page was never cut
+      </h1>
+      <p class="mt-7 text-base sm:text-lg leading-relaxed text-warm-gray/70">
+        The link is broken or the page has moved. Everything we build is one of
+        these two lines of work.
+      </p>
+      <nav class="mt-10 flex flex-wrap items-center justify-center gap-3" aria-label="Recover">
+        {
+          mainNav.map((l) => (
+            <a
+              href={l.href}
+              class="border border-light-teal/40 px-5 py-3 text-[0.78rem] font-semibold uppercase tracking-[0.16em] text-warm-gray hover:border-sand hover:text-sand transition-colors duration-300"
+            >
+              {l.label}
+            </a>
+          ))
+        }
+        <a
+          href="/quote"
+          class="bg-sand text-ink px-5 py-3 text-[0.78rem] font-semibold uppercase tracking-[0.16em] hover:bg-sand-bright transition-colors duration-300"
+        >
+          Request a Quote
+        </a>
+      </nav>
+    </div>
+  </main>
+  <Footer />
+</Layout>

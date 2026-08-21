@@ -6,13 +6,14 @@ import PageHeader from '../components/ui/PageHeader.astro';
 import DrawingToBuilt from '../components/DrawingToBuilt.astro';
 import ProjectGallery from '../components/ProjectGallery.astro';
 import CTABand from '../components/ui/CTABand.astro';
-import { site } from '../data/site';
 import { projects } from '../data/showcase';
 ---
 
 <Layout
-  title={`Projects — From drawing to built | ${site.name}`}
-  description="How a Vetro Steel job runs from set-out drawing to installed work, and a gallery of completed installations in tempered glass and stainless steel."
+  breadcrumbs={[
+    { name: 'Home', href: '/' },
+    { name: 'Projects', href: '/projects' },
+  ]}
 >
   <Nav />
   <main id="main">

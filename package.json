@@ -15,10 +15,12 @@
     "@fontsource-variable/montserrat": "^5.2.8",
     "@fontsource/cinzel": "^5.2.8",
     "@iconify-json/lucide": "^1.2.117",
+    "@resvg/resvg-js": "^2.6.2",
     "@tailwindcss/vite": "^4.3.3",
     "astro": "^7.1.0",
     "astro-icon": "^1.1.5",
     "lenis": "^1.3.25",
+    "satori": "^0.33.3",
     "tailwindcss": "^4.3.3"
   },
   "devDependencies": {

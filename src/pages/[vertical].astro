@@ -10,7 +10,6 @@ import ProcessSteps from '../components/ProcessSteps.astro';
 import ProjectGallery from '../components/ProjectGallery.astro';
 import CTABand from '../components/ui/CTABand.astro';
 import { verticals, type Vertical } from '../data/verticals';
-import { site } from '../data/site';
 
 /**
  * One template, one route, both verticals — and any line added to
@@ -32,8 +31,10 @@ const gap = (where: string) => v.gaps.find((g) => g.where === where);
 ---
 
 <Layout
-  title={`${v.nav} — ${v.headline} | ${site.name}`}
-  description={v.lead}
+  breadcrumbs={[
+    { name: 'Home', href: '/' },
+    { name: v.nav, href: `/${v.slug}` },
+  ]}
 >
   <Nav />
   <main id="main">

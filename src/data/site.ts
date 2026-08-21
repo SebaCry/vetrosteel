@@ -12,6 +12,37 @@ export const site = {
   location: 'Utah · USA',
   region: 'Utah, United States',
 
+  /**
+   * Canonical origin. This drives every canonical tag, og:url, the sitemap and
+   * robots.txt, so it has to be the host that actually serves the site —
+   * www.vetrosteelut.com, with the apex redirecting to it.
+   */
+  origin: 'https://www.vetrosteelut.com',
+
+  /** Structured-data address. Street and phone are still missing — see README. */
+  address: {
+    locality: 'Salt Lake City',
+    regionCode: 'UT',
+    country: 'US',
+  },
+
+  /** Towns we say we serve. Used by schema.org areaServed. */
+  areaServed: [
+    'Salt Lake City',
+    'Provo',
+    'Orem',
+    'Lehi',
+    'Draper',
+    'Sandy',
+    'American Fork',
+    'Park City',
+    'Ogden',
+    'St. George',
+  ],
+
+  /** Profiles for schema.org sameAs. Add real URLs as they exist. */
+  sameAs: [] as string[],
+
   /** Catalog cover taxonomy, in the client's wording and order. */
   catalogCategories: [
     'Sliding Systems',

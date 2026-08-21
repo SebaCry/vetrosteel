@@ -1,0 +1,61 @@
+---
+import SectionHeader from './ui/SectionHeader.astro';
+import { faqs } from '../data/seo';
+
+/**
+ * The visible half of the FAQPage structured data emitted by <Seo>. The words
+ * have to match the schema exactly, so both read from the same array.
+ *
+ * Native <details> rather than a scripted accordion: it is open to crawlers
+ * and to find-in-page even with JavaScript off.
+ */
+---
+
+<section id="faq" class="relative bg-paper text-ink py-24 sm:py-32">
+  <div class="mx-auto max-w-7xl px-5 sm:px-8">
+    <SectionHeader
+      eyebrow="Questions"
+      title="Before you ask us for a number"
+      lead="The things people ask on the first call, answered here instead."
+      tone="light"
+      class="mb-14"
+    />
+
+    <div class="max-w-3xl border-t border-deep-teal/12">
+      {
+        faqs.map((f, i) => (
+          <details class="faq-item group border-b border-deep-teal/12" open={i === 0}>
+            <summary class="flex items-start justify-between gap-6 cursor-pointer list-none py-6">
+              <h3 class="font-display text-lg sm:text-xl font-semibold text-deep-teal leading-snug">
+                {f.q}
+              </h3>
+              <span class="faq-mark shrink-0 mt-1 text-sand" aria-hidden="true">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <path d="M12 5v14M5 12h14" stroke-linecap="round" />
+                </svg>
+              </span>
+            </summary>
+            <p class="pb-7 -mt-1 max-w-2xl text-base leading-relaxed text-ink/70">{f.a}</p>
+          </details>
+        ))
+      }
+    </div>
+  </div>
+</section>
+
+<style>
+  .faq-item summary::-webkit-details-marker {
+    display: none;
+  }
+  .faq-mark svg {
+    transition: transform 0.35s var(--ease-out-expo);
+  }
+  .faq-item[open] .faq-mark svg {
+    transform: rotate(45deg);
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .faq-mark svg {
+      transition: none;
+    }
+  }
+</style>

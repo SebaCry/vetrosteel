@@ -9,7 +9,6 @@ import Vision from '../components/Vision.astro';
 import Services from '../components/Services.astro';
 import Values from '../components/Values.astro';
 import CTABand from '../components/ui/CTABand.astro';
-import { site } from '../data/site';
 
 /**
  * The studio story, moved off the home page in full: about, mission, vision,
@@ -18,8 +17,10 @@ import { site } from '../data/site';
 ---
 
 <Layout
-  title={`About — ${site.legalName}`}
-  description="The studio behind Vetro Steel: mission, vision, capabilities and the values we hold every project to. Utah, USA."
+  breadcrumbs={[
+    { name: 'Home', href: '/' },
+    { name: 'About', href: '/about' },
+  ]}
 >
   <Nav />
   <main id="main">
