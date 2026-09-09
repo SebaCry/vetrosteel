@@ -5,7 +5,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 ## Project
 
 Marketing site for **Vetro Steel Design Studio LLC** (glass hardware & architectural systems, Utah).
-Astro 7 static output + Tailwind v4, deployed to Cloudflare Pages. **The site content is in English**;
+Astro 7 static output + Tailwind v4, deployed to **Vercel** from GitHub. **The site content is in English**;
 [README.md](README.md) — the fuller project document, worth reading — is in Spanish.
 
 Product terminology, taxonomy and palette come from the client's own catalog (*PRODUCT CATALOG — MAY 2026*).
@@ -20,27 +20,22 @@ npm run build      # static build into /dist
 npm run preview    # serves /dist, but WITHOUT Pages Functions (the quote form 404s)
 ```
 
-Test the quote endpoint for real (wrangler is a devDependency; Windows: run from
-the Bash tool, or split the flags):
+Test the quote endpoint (12 cases against the real handler — no emulator, no Vercel CLI):
 
 ```bash
-npm run build
-npm run preview:functions -- --port 8788 \
-  --binding RESEND_API_KEY=re_xxx \
-  --binding QUOTE_TO=contact@vetrosteelut.com \
-  --binding "QUOTE_FROM=Vetro Steel <quotes@vetrosteelut.com>"
+npm run test:quote                        # no key: the three "valid" rows expect 502
+RESEND_API_KEY=re_xxx npm run test:quote  # real key: expects 200 and actually sends mail
 ```
 
-A fake key is enough to exercise everything but delivery: the endpoint returns
-502 with `Resend 401` in the log, which proves the request reached Resend.
+A fake key exercises everything but delivery: 502 with `Resend 401` in the log proves the request reached
+Resend. **`/api/quote` does not exist under `astro dev` or `astro preview`** — it is a Vercel Function, not
+an Astro route, so the form 404s locally by design and this script is how it gets checked.
 
 Visual verification (there is no test suite, no linter and no formatter — screenshots are the check):
 
 ```bash
-node shot.mjs http://localhost:4321 shots   # Playwright: 5 pages × desktop/mobile, plan viewer states, form errors
+node shot.mjs http://localhost:4321 shots   # Playwright: all 7 routes × desktop/mobile, plan viewer states, form errors
 ```
-
-`shot.mjs` still walks the original five routes; `/projects` is not in its list.
 
 ## Architecture
 
@@ -122,19 +117,23 @@ button need ~990px beside the lockup, and at `md` the button fell off the right 
 
 ### Quote form
 
-[functions/api/quote.ts](functions/api/quote.ts) is a Cloudflare Pages Function picked up from the repo root
-— it is **not** part of the Astro build and does not exist under `astro preview`. Validates, honeypots
-(`website` field → silent `200`), and relays through Resend. Requires `RESEND_API_KEY`, `QUOTE_TO`,
-`QUOTE_FROM` (optional: `QUOTE_BCC`, `QUOTE_REPLY_TO`); without the required three it returns **503 on
-purpose** so the form can tell the visitor to email directly rather than swallowing a lead. Responses:
-`400` bad JSON · `405` non-POST · `422` field errors · `502` delivery failure · `503` unconfigured ·
-`200` ok.
+The logic is in [src/lib/quote.ts](src/lib/quote.ts) as a plain `handleQuote(request, env)` —
+[api/quote.ts](api/quote.ts) is a five-line Vercel adapter over it. That split exists so the endpoint can be
+tested without an emulator (`npm run test:quote`); keep new logic in the lib, not the adapter. Vercel deploys
+anything in the root `api/` directory as a function with no `vercel.json` entry, and the Web-standard `fetch`
+export means it is Request → Response throughout.
+
+Validates, honeypots (`website` field → silent `200`), and relays through Resend. Requires `RESEND_API_KEY`,
+`QUOTE_TO`, `QUOTE_FROM` (optional: `QUOTE_BCC`, `QUOTE_REPLY_TO`); without the required three it returns
+**503 on purpose** so the form can tell the visitor to email directly rather than swallowing a lead.
+Responses: `400` bad JSON · `405` non-POST · `422` field errors · `502` delivery failure · `503`
+unconfigured · `200` ok.
 
 Two emails go out per accepted request: the internal notification (`reply_to` set to the visitor) decides
-the HTTP response, and the visitor's acknowledgement is handed to `waitUntil` afterwards — a bounced
+the HTTP response, and the visitor's acknowledgement is awaited afterwards with its own `.catch` — a bounced
 acknowledgement must never turn a captured lead into an error the visitor sees. It imports from
-`src/data/verticals` (esbuild resolves it fine; the module is plain TS with no Astro imports), which is
-what keeps the accepted `vertical` values in step with the options the form renders.
+`src/data/verticals`, which is what keeps the accepted `vertical` values in step with the options the form
+renders.
 
 ## Material gaps
 
@@ -153,8 +152,16 @@ sheets, and matched before/after pairs (README has the detail).
 
 ## Deploy
 
-Cloudflare Pages, Astro preset, build `npm run build`, output `dist` ([wrangler.jsonc](wrangler.jsonc)).
-Env vars are set in the Pages project, not in the repo.
+Vercel, Astro preset, build `npm run build`, output `dist`, auto-deploying from GitHub
+(`SebaCry/project_johan`) on push to `main`. Env vars live in the Vercel project, never in the repo.
+
+**[vercel.json](vercel.json) is load-bearing, do not delete it.** `build.format: 'file'` emits
+`dist/commercial.html`, and Vercel will not serve that at `/commercial` without `cleanUrls: true` — without
+it every subpage 404s while only `/commercial.html` resolves, which is exactly the production bug it was
+added to fix. `trailingSlash: false` keeps that agreeing with Astro's `trailingSlash: 'never'`.
+
+The repo was originally written for Cloudflare Pages; that is gone (no `functions/`, no `wrangler.jsonc`, no
+wrangler dependency). If a Cloudflare reference turns up anywhere, it is stale.
 
 README's "Antes de publicar" list is partly stale — the domain and robots.txt items are already done
 (canonical is `https://www.vetrosteelut.com`, robots is generated). The unreferenced `public/images/arch/`

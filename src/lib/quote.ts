@@ -1,25 +1,25 @@
-import { verticalSlugs, verticalLabel } from '../../src/data/verticals';
+import { verticalSlugs, verticalLabel } from '../data/verticals';
 
 /**
- * POST /api/quote — Cloudflare Pages Function.
+ * The quote endpoint's whole implementation, in plain Web Request/Response.
  *
- * Deployed automatically alongside the static build: Pages picks up this
- * `functions/` directory from the repo root, independent of Astro's `dist`.
+ * It lives here rather than in `api/quote.ts` for two reasons: the hosting
+ * adapter stays a five-line file, and this module can be imported and exercised
+ * straight from Node — the deployed function needs no emulator to be tested.
  *
- * Required environment variables (Pages project → Settings → Variables):
- *   RESEND_API_KEY   Resend API key.
- *   QUOTE_TO         Inbox that receives the requests.
- *   QUOTE_FROM       Verified sender, e.g. "Vetro Steel <quotes@vetrosteelut.com>".
- * Optional:
- *   QUOTE_BCC        Second inbox copied on every request.
- *   QUOTE_REPLY_TO   Address the visitor's acknowledgement asks them to reply
- *                    to. Defaults to QUOTE_TO.
+ * Environment (Vercel → Project → Settings → Environment Variables):
+ *   RESEND_API_KEY   Resend API key.                                 required
+ *   QUOTE_TO         Inbox that receives the requests.               required
+ *   QUOTE_FROM       Verified sender, "Vetro Steel <quotes@…>".      required
+ *   QUOTE_BCC        Second inbox copied on every request.           optional
+ *   QUOTE_REPLY_TO   Where the visitor's acknowledgement replies to. optional
+ *                    Defaults to QUOTE_TO.
  *
- * With the required three unset the endpoint fails loudly with a 503 rather
- * than swallowing a lead — the form then tells the visitor to email directly.
+ * With the required three unset it fails loudly with a 503 rather than
+ * swallowing a lead — the form then tells the visitor to email directly.
  */
 
-interface Env {
+export interface QuoteEnv {
   RESEND_API_KEY?: string;
   QUOTE_TO?: string;
   QUOTE_FROM?: string;
@@ -69,7 +69,8 @@ function validate(data: Payload) {
   if (message.length < 15) fields.message = 'A sentence or two about the project, please.';
 
   for (const [key, limit] of Object.entries(MAX)) {
-    if (str(data[key]).length > limit) fields[key] = `That is longer than we can accept (${limit} characters).`;
+    if (str(data[key]).length > limit)
+      fields[key] = `That is longer than we can accept (${limit} characters).`;
   }
 
   return {
@@ -85,13 +86,6 @@ function validate(data: Payload) {
     },
   };
 }
-
-/**
- * Anything that is not a POST: without this, Pages falls through to the static
- * asset handler and answers a GET /api/quote with the home page.
- */
-export const onRequest: () => Response = () =>
-  json({ error: 'This endpoint only accepts POST.' }, 405);
 
 type Mail = {
   from: string;
@@ -113,17 +107,18 @@ async function send(apiKey: string, mail: Mail) {
     body: JSON.stringify(mail),
   });
   if (!res.ok) {
-    const body = await res.text();
-    throw new Error(`Resend ${res.status}: ${body}`);
+    throw new Error(`Resend ${res.status}: ${await res.text()}`);
   }
   return res;
 }
 
-export const onRequestPost: (ctx: {
-  request: Request;
-  env: Env;
-  waitUntil: (p: Promise<unknown>) => void;
-}) => Promise<Response> = async ({ request, env, waitUntil }) => {
+export async function handleQuote(request: Request, env: QuoteEnv): Promise<Response> {
+  // Without this, an unmatched method falls through to the static handler and a
+  // GET /api/quote answers with a page instead of an error.
+  if (request.method !== 'POST') {
+    return json({ error: 'This endpoint only accepts POST.' }, 405);
+  }
+
   let data: Payload;
   try {
     data = (await request.json()) as Payload;
@@ -197,14 +192,14 @@ export const onRequestPost: (ctx: {
 
   /* ------------------------------------------------------------------ */
   /*  Acknowledgement to the visitor.                                    */
-  /*  Secondary: the lead is already safe in the inbox above, so this is */
-  /*  sent after the response is decided and a failure only gets logged. */
+  /*  Secondary: the lead is already safe in the inbox above, so a       */
+  /*  failure here is logged and never shown to the visitor.             */
   /* ------------------------------------------------------------------ */
-  const replyTo = QUOTE_REPLY_TO || QUOTE_TO;
+  const firstName = clean.name.split(/\s+/)[0];
   const ackHtml = `
     <div style="font-family:system-ui,sans-serif;font-size:15px;line-height:1.65;color:#111827">
       <p style="font-family:Georgia,serif;font-size:20px;color:#0f3b46;margin:0 0 18px">
-        Thank you, ${escapeHtml(clean.name.split(/\s+/)[0])} — we have your request.
+        Thank you, ${escapeHtml(firstName)} — we have your request.
       </p>
       <p style="margin:0 0 18px">
         This is confirmation that it reached Vetro Steel Design Studio. A person reads
@@ -224,14 +219,14 @@ export const onRequestPost: (ctx: {
     </div>
   `;
 
-  const ack = send(RESEND_API_KEY, {
+  await send(RESEND_API_KEY, {
     from: QUOTE_FROM,
     to: [clean.email],
-    reply_to: replyTo,
+    reply_to: QUOTE_REPLY_TO || QUOTE_TO,
     subject: 'We received your request — Vetro Steel',
     html: ackHtml,
     text: [
-      `Thank you, ${clean.name.split(/\s+/)[0]} — we have your request.`,
+      `Thank you, ${firstName} — we have your request.`,
       '',
       'This is confirmation that it reached Vetro Steel Design Studio. We will come back to you within one business day.',
       '',
@@ -250,7 +245,5 @@ export const onRequestPost: (ctx: {
     console.error('[quote] Acknowledgement failed', err);
   });
 
-  waitUntil(ack);
-
   return json({ ok: true });
-};
+}

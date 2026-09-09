@@ -93,8 +93,8 @@ archivos de datos no necesitan `import`.
 | Reveals / parallax | IntersectionObserver + CSS, parallax a medida (44px de recorrido) |
 | Iconos | astro-icon + Lucide |
 | Tipografías | `@fontsource` Cinzel + Montserrat (self-host) |
-| Formulario | Cloudflare Pages Function + Resend |
-| Hosting | Cloudflare Pages |
+| Formulario | Vercel Function (`api/quote.ts`) + Resend |
+| Hosting | Vercel, desplegando desde GitHub |
 
 ---
 
@@ -104,23 +104,24 @@ archivos de datos no necesitan `import`.
 npm install
 npm run dev        # http://localhost:4321
 npm run build      # genera /dist
-npm run preview    # sirve /dist (sin Pages Functions)
+npm run preview    # sirve /dist (sin la función del formulario)
+npm run test:quote # ejercita el endpoint del formulario
 ```
 
-**Ojo:** `astro preview` no ejecuta las Pages Functions, así que el formulario
-devolverá 404 al enviar. Para probarlo de verdad:
+**Ojo:** ni `astro dev` ni `astro preview` ejecutan la función de `/api/quote`
+— es una Vercel Function, no una ruta de Astro, así que en local el formulario
+devuelve 404 al enviar. Por eso toda la lógica vive en
+[`src/lib/quote.ts`](src/lib/quote.ts) como `Request → Response` puro, y
+`api/quote.ts` es solo el adaptador: `npm run test:quote` la prueba entera sin
+emulador ni CLI.
 
 ```bash
-npm run build
-npm run preview:functions -- \
-  --binding RESEND_API_KEY=re_xxx \
-  --binding QUOTE_TO=contact@vetrosteelut.com \
-  --binding "QUOTE_FROM=Vetro Steel <quotes@vetrosteelut.com>"
+npm run test:quote                        # 12 casos; sin clave, el envío falla (502) a propósito
+RESEND_API_KEY=re_xxx npm run test:quote  # con clave real: manda correo de verdad
 ```
 
-Wrangler está en `devDependencies`, así que no hace falta `npx` a un paquete
-remoto. Sin `RESEND_API_KEY` válida el endpoint responde 502 y el formulario lo
-dice — es la señal de que la clave falta, no de que el código esté roto.
+Sin `RESEND_API_KEY` válida el endpoint responde 502 y el formulario lo dice —
+es la señal de que la clave falta, no de que el código esté roto.
 
 ### Capturas de verificación
 
@@ -172,18 +173,29 @@ Lo que falta hoy:
 
 ---
 
-## Despliegue en Cloudflare Pages
+## Despliegue en Vercel
+
+Vercel despliega solo en cada push a `main` del repo de GitHub.
 
 ### Build
 
 - **Framework preset**: `Astro`
 - **Build command**: `npm run build`
-- **Build output directory**: `dist`
+- **Output directory**: `dist`
 
-El directorio `functions/` de la raíz lo recoge Pages automáticamente; no forma
-parte del build de Astro.
+Dos piezas fuera del build de Astro:
 
-### Variables de entorno (Settings → Variables and Secrets)
+- **`api/quote.ts`** — Vercel recoge cualquier archivo del directorio `api/` de
+  la raíz y lo despliega como función. No hace falta declararlo en
+  `vercel.json`.
+- **[`vercel.json`](vercel.json)** — `cleanUrls` y `trailingSlash`. **No se
+  puede borrar.** Astro genera `dist/commercial.html` (por `build.format:
+  'file'`) y Vercel, sin `cleanUrls`, no sirve eso en `/commercial`: devuelve
+  404 en todas las subpáginas y solo responde `/commercial.html`. `trailingSlash:
+  false` mantiene la coherencia con el `trailingSlash: 'never'` de Astro, para
+  que la URL canónica, el sitemap y la URL servida digan lo mismo.
+
+### Variables de entorno (Settings → Environment Variables)
 
 | Variable | Obligatoria | Uso |
 | -------- | ----------- | --- |
@@ -201,13 +213,14 @@ al visitante que escriba por email, en vez de tragarse el lead en silencio.
 1. Crear cuenta en [resend.com](https://resend.com) y en **Domains** añadir
    `vetrosteelut.com`.
 2. Resend entrega tres registros DNS (SPF/`MX` de retorno y dos DKIM). Cargarlos
-   en el DNS del dominio — si está en Cloudflare, en **DNS → Records**, con el
-   proxy **desactivado** (nube gris). Sin dominio verificado Resend solo deja
-   enviar a la dirección de la propia cuenta.
+   donde esté el DNS de `vetrosteelut.com` — hoy el dominio apunta a Vercel, así
+   que si el DNS también está allí van en **Vercel → Domains →
+   vetrosteelut.com**. Sin dominio verificado Resend solo deja enviar a la
+   dirección de la propia cuenta.
 3. **API Keys → Create**, permiso *Sending access*. La clave se ve una sola vez.
-4. En el proyecto de Pages: **Settings → Variables and Secrets**, añadir las
-   tres variables. `RESEND_API_KEY` como **Secret**, las otras como texto.
-   Marcarlas para *Production* y *Preview*.
+4. En el proyecto de Vercel: **Settings → Environment Variables**, añadir las
+   tres. `RESEND_API_KEY` marcada como **Sensitive**, las otras como texto
+   plano. Alcance *Production* y *Preview*.
 5. Re-desplegar (las variables no se aplican al build ya publicado) y enviar una
    solicitud de prueba desde `/quote`.
 
@@ -246,7 +259,9 @@ src/
 │  ├─ seo.ts                   # tabla de metadatos por ruta, FAQ y grafo JSON-LD
 │  ├─ showcase.ts              # material de /projects (clips generados vs. obra real)
 │  └─ verticals.ts             # LAS VERTICALES: copy, producto, planos, proceso, huecos
-├─ lib/images.ts               # resolución de assets por clave
+├─ lib/
+│  ├─ images.ts                # resolución de assets por clave
+│  └─ quote.ts                 # lógica del formulario (Request → Response, testeable)
 ├─ assets/                     # fotografía y planos del catálogo (pasa por astro:assets)
 │  ├─ scenes/  products/  plans/
 ├─ layouts/Layout.astro        # <head>, Lenis, parallax, scroll-reveal
@@ -254,9 +269,11 @@ src/
 │  ├─ ui/                      # primitivas reutilizables
 │  └─ *.astro                  # secciones
 ├─ pages/
-│  ├─ index.astro  about.astro  quote.astro
-│  └─ [vertical].astro         # genera /commercial y /residential
+│  ├─ index.astro  about.astro  quote.astro  projects.astro
+│  └─ [vertical].astro         # genera /commercial, /residential y /maintenance
 └─ styles/global.css           # tokens de marca, utilidades, animaciones
 
-functions/api/quote.ts         # Pages Function del formulario
+api/quote.ts                   # Vercel Function: adaptador de src/lib/quote.ts
+scripts/quote-check.mjs        # npm run test:quote
+vercel.json                    # cleanUrls — sin esto, 404 en toda subpágina
 ```

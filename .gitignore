@@ -15,8 +15,8 @@ pnpm-debug.log*
 .env
 .env.production
 
-# cloudflare / wrangler
-.wrangler/
+# vercel
+.vercel/
 
 # os / editor
 .DS_Store
