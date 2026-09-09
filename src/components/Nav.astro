@@ -21,7 +21,10 @@ const isActive = (href: string) => path === href || path.startsWith(`${href}/`);
       <Logo variant="full" tone="light" size="h-14 sm:h-20 lg:h-24 w-auto" />
     </a>
 
-    <div class="hidden md:flex items-center gap-2 lg:gap-3">
+    <!-- Held back to `lg`: five nav items plus the quote button need about
+         990px next to the lockup. At the old `md` (768px) the button — the one
+         thing on the bar that converts — was pushed clean off the screen. -->
+    <div class="hidden lg:flex items-center gap-2 lg:gap-3">
       {
         mainNav.map((l) => (
           <a
@@ -56,7 +59,7 @@ const isActive = (href: string) => path === href || path.startsWith(`${href}/`);
          missing it. It is now a labelled, outlined control in the brand accent. -->
     <button
       id="menu-toggle"
-      class="md:hidden group flex items-center gap-2.5 border border-sand/70 bg-sand/10 text-sand pl-3.5 pr-4 py-2.5 -mr-1 transition-colors duration-300 active:bg-sand active:text-ink"
+      class="lg:hidden group flex items-center gap-2.5 border border-sand/70 bg-sand/10 text-sand pl-3.5 pr-4 py-2.5 -mr-1 transition-colors duration-300 active:bg-sand active:text-ink"
       aria-label="Open menu"
       aria-expanded="false"
       aria-controls="mobile-menu"
@@ -73,7 +76,7 @@ const isActive = (href: string) => path === href || path.startsWith(`${href}/`);
   <!-- Mobile panel -->
   <div
     id="mobile-menu"
-    class="md:hidden overflow-hidden max-h-0 transition-[max-height] duration-500 ease-out bg-ink/98 backdrop-blur border-t border-white/5"
+    class="lg:hidden overflow-hidden max-h-0 transition-[max-height] duration-500 ease-out bg-ink/98 backdrop-blur border-t border-white/5"
   >
     <div class="px-6 pt-3 pb-7 flex flex-col">
       {

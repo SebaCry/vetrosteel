@@ -8,14 +8,33 @@ import { site } from '../data/site';
  * success and error. The server re-validates — the client checks are a
  * courtesy, not a gate.
  */
+/**
+ * Grouped rather than flat: with three lines of work a single list of ten
+ * options stops reading as a menu and starts reading as a wall.
+ */
 const projectTypes = [
-  'Shower enclosure',
-  'Sliding shower system',
-  'Glass railing / guardrail',
-  'Office partition',
-  'Entrance / storefront',
-  'Hardware supply only',
-  'Something else',
+  {
+    group: 'Fabrication & install',
+    items: [
+      'Shower enclosure',
+      'Sliding shower system',
+      'Glass railing / guardrail',
+      'Office partition',
+      'Entrance / storefront',
+      'Hardware supply only',
+    ],
+  },
+  {
+    group: 'Maintenance',
+    items: [
+      'Monthly maintenance plan',
+      'Glass cleaning & servicing',
+      'Vinyl / frosted film',
+      'Furniture assembly or relocation',
+      'Painting & drywall repair',
+    ],
+  },
+  { group: 'Other', items: ['Something else'] },
 ];
 ---
 
@@ -84,7 +103,15 @@ const projectTypes = [
         <div class="quote-select-wrap">
           <select class="quote-input" id="q-type" name="projectType">
             <option value="">Select…</option>
-            {projectTypes.map((t) => <option value={t}>{t}</option>)}
+            {
+              projectTypes.map((g) => (
+                <optgroup label={g.group}>
+                  {g.items.map((t) => (
+                    <option value={t}>{t}</option>
+                  ))}
+                </optgroup>
+              ))
+            }
           </select>
         </div>
       </div>
@@ -133,7 +160,8 @@ const projectTypes = [
       <div data-feedback="success" hidden class="border-l-2 border-sand bg-sand/8 px-5 py-4">
         <p class="font-display text-lg font-semibold text-sand">Request received</p>
         <p class="mt-1.5 text-sm leading-relaxed text-warm-gray/70" data-success-body>
-          We'll come back to you within one business day.
+          A confirmation is on its way to your inbox, and we'll come back to you within
+          one business day.
         </p>
       </div>
       <div data-feedback="error" hidden class="border-l-2 border-red-400 bg-red-400/8 px-5 py-4">
@@ -189,6 +217,11 @@ const projectTypes = [
   select.quote-input option {
     background-color: var(--color-ink);
     color: var(--color-warm-gray);
+  }
+  select.quote-input optgroup {
+    background-color: var(--color-ink);
+    color: var(--color-sand);
+    font-style: normal;
   }
   .quote-select-wrap {
     position: relative;

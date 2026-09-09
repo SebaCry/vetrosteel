@@ -38,6 +38,12 @@ export const routeSeo: Record<string, RouteSeo> = {
       'Custom frameless shower enclosures, sliding bath screens and glass railings for Utah homes. Measured after tiling, installed in a single day.',
     focus: 'Frameless Showers & Bath Enclosures',
   },
+  '/maintenance': {
+    title: 'Office Maintenance & Glass Servicing in Utah | Vetro Steel',
+    description:
+      'Subscription facility maintenance for Utah offices: painting, drywall, furniture installation, glass cleaning, vinyl and preventive hardware servicing on a flat monthly fee.',
+    focus: 'Operational Maintenance, on a Flat Fee',
+  },
   '/projects': {
     title: 'Glass & Steel Projects in Utah — Installed Work',
     description:
@@ -91,6 +97,10 @@ export const faqs = [
   {
     q: 'What glass thickness do you use for frameless railings?',
     a: 'It depends on the span, the fixing method and the load the guardrail has to take. We confirm the make-up against the specific opening before quoting, rather than quoting a default.',
+  },
+  {
+    q: 'Do you maintain what you install?',
+    a: 'Yes, on a monthly subscription. Scheduled visits cover glass cleaning, hardware replacement and preventive servicing of hinges, handles and locks, alongside general office upkeep — painting, drywall repair and furniture installation — on a flat fee agreed up front.',
   },
   {
     q: 'Do you work with architects and general contractors?',

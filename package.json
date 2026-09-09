@@ -8,6 +8,7 @@
     "start": "astro dev",
     "build": "astro build",
     "preview": "astro preview",
+    "preview:functions": "wrangler pages dev dist",
     "astro": "astro"
   },
   "dependencies": {
@@ -24,6 +25,7 @@
     "tailwindcss": "^4.3.3"
   },
   "devDependencies": {
-    "playwright": "^1.61.1"
+    "playwright": "^1.61.1",
+    "wrangler": "^4.130.0"
   }
 }

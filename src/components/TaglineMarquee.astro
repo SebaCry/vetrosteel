@@ -25,12 +25,16 @@ const taglines = [
 </div>
 
 <style>
+  /* The track holds the list twice over, so one full set is 50% of it — minus
+     half a gap, because `gap` sits between the two sets as well as inside
+     them. Travelling a plain -50% left that half gap over and the loop visibly
+     jumped sideways once every cycle. */
   @keyframes marquee {
     from {
       transform: translateX(0);
     }
     to {
-      transform: translateX(-50%);
+      transform: translateX(calc(-50% - 1.25rem));
     }
   }
   .marquee {

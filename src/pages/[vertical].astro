@@ -6,6 +6,8 @@ import VerticalHero from '../components/VerticalHero.astro';
 import CategoryRow from '../components/CategoryRow.astro';
 import PlanViewer from '../components/PlanViewer.astro';
 import ProductGrid from '../components/ProductGrid.astro';
+import ProgramGrid from '../components/ProgramGrid.astro';
+import ServiceChecklist from '../components/ServiceChecklist.astro';
 import ProcessSteps from '../components/ProcessSteps.astro';
 import ProjectGallery from '../components/ProjectGallery.astro';
 import CTABand from '../components/ui/CTABand.astro';
@@ -71,22 +73,60 @@ const gap = (where: string) => v.gaps.find((g) => g.where === where);
       items={v.categories}
     />
 
-    <PlanViewer
-      plans={v.plans}
-      title={v.planIntro.title}
-      lead={v.planIntro.body}
-      gap={gap('Office partition drawings')}
-    />
+    {
+      v.plans && v.plans.length > 0 && v.planIntro && (
+        <PlanViewer
+          plans={v.plans}
+          title={v.planIntro.title}
+          lead={v.planIntro.body}
+          gap={gap('Office partition drawings')}
+        />
+      )
+    }
 
-    <ProductGrid
-      eyebrow="Hardware"
-      title="From the catalog"
-      lead="Fittings we stock and specify, in the finish families they ship in."
-      items={v.products}
-      gap={gap('Product specifications')}
-    />
+    {
+      v.products && v.products.length > 0 && (
+        <ProductGrid
+          eyebrow="Hardware"
+          title="From the catalog"
+          lead="Fittings we stock and specify, in the finish families they ship in."
+          items={v.products}
+          gap={gap('Product specifications')}
+        />
+      )
+    }
 
-    <ProcessSteps steps={v.process} />
+    {
+      v.programs && v.programs.length > 0 && (
+        <ProgramGrid
+          title="What the subscription commits us to"
+          lead="Five standing commitments, the same every month — this is what you are buying, not a call-out list."
+          items={v.programs}
+          gap={gap('Plan tiers and pricing')}
+        />
+      )
+    }
+
+    {
+      v.serviceGroups && v.serviceGroups.length > 0 && (
+        <ServiceChecklist
+          title="What the visits cover"
+          lead="The work included in a standing plan, grouped the way a facilities manager checks it."
+          groups={v.serviceGroups}
+          gap={gap('Client panel')}
+        />
+      )
+    }
+
+    <ProcessSteps
+      steps={v.process}
+      title={v.slug === 'maintenance' ? 'From walk-through to sign-off' : undefined}
+      lead={
+        v.slug === 'maintenance'
+          ? 'Four stages, repeated every cycle — and we are the ones accountable at each of them.'
+          : undefined
+      }
+    />
 
     <ProjectGallery
       title="Selected work"

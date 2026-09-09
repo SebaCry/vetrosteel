@@ -30,6 +30,8 @@ const pages = [
   ['home', '/'],
   ['commercial', '/commercial'],
   ['residential', '/residential'],
+  ['maintenance', '/maintenance'],
+  ['projects', '/projects'],
   ['about', '/about'],
   ['quote', '/quote'],
 ];

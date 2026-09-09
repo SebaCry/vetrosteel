@@ -38,6 +38,14 @@ html:not(.lenis) {
   scroll-behavior: smooth;
 }
 
+/* The header is fixed and ~113px tall on desktop, so an anchor that lands at
+   scroll position zero lands *behind* it. This is what a cross-page jump like
+   /about#capabilities uses — there is no script in that path to offset it — so
+   the offset has to live on the targets themselves. */
+:where(section[id], [id][data-anchor], main [id]:where(section, article, div)) {
+  scroll-margin-top: 7.5rem;
+}
+
 /* ------------------------------------------------------------------ */
 /*  Lenis smooth scroll                                                */
 /* ------------------------------------------------------------------ */

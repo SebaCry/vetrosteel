@@ -1,0 +1,57 @@
+---
+import { Icon } from 'astro-icon/components';
+import SectionHeader from './ui/SectionHeader.astro';
+import MaterialNote from './ui/MaterialNote.astro';
+import type { ProgramItem } from '../data/verticals';
+
+/**
+ * What a subscription actually commits us to — the service line's answer to
+ * <ProductGrid>, which has nothing to show when the deliverable is labour.
+ *
+ * Five items land as 3 + 2 on desktop, so the last row is deliberately wider
+ * rather than leaving a hole in a four-column grid.
+ */
+interface Props {
+  eyebrow?: string;
+  title: string;
+  lead?: string;
+  items: ProgramItem[];
+  gap?: { where: string; needs: string };
+}
+const { eyebrow = 'The programme', title, lead, items, gap } = Astro.props;
+---
+
+<section id="programme" class="relative bg-deep-teal text-warm-gray py-24 sm:py-32 overflow-hidden">
+  <div class="absolute inset-0 blueprint-grid opacity-30"></div>
+
+  <div class="relative mx-auto max-w-7xl px-5 sm:px-8">
+    <SectionHeader eyebrow={eyebrow} title={title} lead={lead} tone="dark" class="mb-14" />
+
+    {gap && <MaterialNote where={gap.where} needs={gap.needs} />}
+
+    <div class="grid sm:grid-cols-2 lg:grid-cols-6 gap-px bg-white/10 border border-white/10">
+      {
+        items.map((p, i) => (
+          <article
+            class:list={[
+              'relative bg-deep-teal p-8 sm:p-10 group hover:bg-teal transition-colors duration-500 tick-frame',
+              // 5 items over 6 columns: three, then two half-width panels.
+              i < 3 ? 'lg:col-span-2' : 'lg:col-span-3',
+            ]}
+            data-reveal
+            style={`--reveal-delay:${(i % 3) * 100}ms`}
+          >
+            <span class="absolute top-6 right-7 font-display text-sm text-sand/40 group-hover:text-sand/70 transition-colors">
+              0{i + 1}
+            </span>
+            <Icon name={p.icon} class="w-8 h-8 text-sand" />
+            <h3 class="mt-6 font-display text-xl font-semibold text-warm-gray leading-snug tracking-wide">
+              {p.title}
+            </h3>
+            <p class="mt-3 text-sm leading-relaxed text-warm-gray/65 max-w-prose">{p.body}</p>
+          </article>
+        ))
+      }
+    </div>
+  </div>
+</section>

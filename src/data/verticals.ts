@@ -1,12 +1,17 @@
 /**
- * The two business verticals.
+ * The business verticals.
  *
- * Everything a vertical page renders lives here. Adding a third line (say
- * "Skylights & Canopies") means appending one entry to `verticals` — the
- * route, nav entry, sitemap and quote-form option all follow from it.
+ * Everything a vertical page renders lives here. Adding a line means appending
+ * one entry to `verticals` — the route, nav entry, sitemap and quote-form
+ * option all follow from it. (The nav order in src/data/site.ts and the search
+ * metadata in src/data/seo.ts are the two manual steps.)
  *
  * Copy uses the client's own catalog terminology: Sliding Systems, Shower
  * Hardware, Pull Handles, Railings, Entrance Systems.
+ *
+ * Not every line sells hardware off a drawing: `maintenance` is a recurring
+ * service contract, so `products`, `plans` and `planIntro` are optional and it
+ * carries `programs` + `serviceGroups` instead.
  */
 
 export interface ProductItem {
@@ -48,8 +53,23 @@ export interface PlanItem {
   callouts: PlanCallout[];
 }
 
+/** One commitment of the maintenance subscription. Rendered by <ProgramGrid>. */
+export interface ProgramItem {
+  /** Lucide icon name, as astro-icon expects it. */
+  icon: string;
+  title: string;
+  body: string;
+}
+
+/** A named list of tasks covered by a service line. Rendered by <ServiceChecklist>. */
+export interface ServiceGroup {
+  title: string;
+  note: string;
+  items: string[];
+}
+
 export interface Vertical {
-  slug: 'commercial' | 'residential';
+  slug: 'commercial' | 'residential' | 'maintenance';
   nav: string;
   eyebrow: string;
   headline: string;
@@ -57,9 +77,14 @@ export interface Vertical {
   hero: { image: string; alt: string };
   intro: { title: string; body: string[] };
   categories: CategoryItem[];
-  products: ProductItem[];
-  plans: PlanItem[];
-  planIntro: { title: string; body: string };
+  /** Hardware lines only. A service line has no catalog to show. */
+  products?: ProductItem[];
+  plans?: PlanItem[];
+  planIntro?: { title: string; body: string };
+  /** Subscription commitments. Service lines only. */
+  programs?: ProgramItem[];
+  /** What the visits actually cover. Service lines only. */
+  serviceGroups?: ServiceGroup[];
   process: ProcessStep[];
   gallery: GalleryItem[];
   cta: { headline: string; body: string };
@@ -495,8 +520,181 @@ export const residential: Vertical = {
   ],
 };
 
-export const verticals: Vertical[] = [commercial, residential];
+/**
+ * Facility maintenance — the subscription line.
+ *
+ * Source: the client's own services brief (requeriments/servicios.pdf,
+ * "Mantenimiento Operativo B2B"). The brief is in Spanish; the site is in
+ * English, so the copy below is that document translated, not expanded. Where
+ * the brief promises something the site cannot yet evidence — a client-facing
+ * panel, a price — it is declared in `gaps` rather than described as if built.
+ *
+ * This line sells recurring labour, so it carries no `products` and no `plans`:
+ * there is no catalog fitting and no cut-out template behind a paint touch-up.
+ */
+export const maintenance: Vertical = {
+  slug: 'maintenance',
+  nav: 'Maintenance',
+  eyebrow: 'Maintenance',
+  headline: 'Your building, held at premium level',
+  lead:
+    'A subscription maintenance programme for commercial offices — scheduled trades, preventive glass and hardware servicing, and a written record of every visit.',
+  hero: {
+    image: 'scenes/office-glass-doors.jpg',
+    alt: 'Office interior with glass partition doors and stainless hardware',
+  },
+  intro: {
+    title: 'The work between the projects',
+    body: [
+      'An office does not fail all at once. It degrades — a scuffed wall here, a door that drops on its hinges, a partition left with the last tenant\'s vinyl on it. Each item is too small to raise a purchase order for, and together they are what makes a floor look tired.',
+      'So we take them on a subscription instead: a technical partner on a fixed monthly fee, coordinating painting, drywall, furniture and glass servicing around your operation rather than interrupting it. One vendor, one schedule, one invoice.',
+    ],
+  },
+  categories: [
+    {
+      title: 'Scheduled Trades',
+      body: 'Painting and touch-up, drywall repair, basic electrical and space redistribution — booked into the window you choose, not the one that suits us.',
+      image: 'projects/clinic-partition-blue.jpg',
+    },
+    {
+      title: 'Glass & Hardware Servicing',
+      body: 'Cleaning, installation and removal of glazing, vinyl work, hardware replacement and preventive servicing of the fittings that move every day.',
+      image: 'scenes/tempered-glass-edge.jpg',
+    },
+    {
+      title: 'Furniture & Fit-Out',
+      body: 'Relocation, assembly and installation of office furniture — desks, whiteboards, screen mounts and storage — including reconfiguration between teams.',
+      image: 'scenes/office-glass-doors.jpg',
+    },
+  ],
+  programs: [
+    {
+      icon: 'lucide:calendar-clock',
+      title: 'Intelligent Scheduling',
+      body: 'You pick the exact window. We coordinate recurring visits for painting, carpentry, basic electrical and space redistribution without interrupting your team\'s operation.',
+    },
+    {
+      icon: 'lucide:target',
+      title: 'Managed by Objective, or Preventive',
+      body: 'Assign priority tasks yourself, or let us run our own technical protocol — a full walk-and-check of the floor on every inspection.',
+    },
+    {
+      icon: 'lucide:clipboard-check',
+      title: 'Digital Audit & Inspection',
+      body: 'Every visit closes with a control report and a completed checklist, so each square metre stays traceable rather than remembered.',
+    },
+    {
+      icon: 'lucide:wallet',
+      title: 'Predictable Operating Costs',
+      body: 'A flat monthly fee to budget against. No financial surprises, no hidden costs and no unexpected invoices at the end of a quarter.',
+    },
+    {
+      icon: 'lucide:zap',
+      title: 'Special Projects on Demand',
+      body: 'Remodelling, fast adaptations or corporate events outside the usual plan, taken on with priority attention and outside the standing schedule.',
+    },
+  ],
+  serviceGroups: [
+    {
+      title: 'General services',
+      note: 'The trades that keep a floor presentable between fit-outs.',
+      items: [
+        'General painting and touch-up',
+        'Drywall and plasterboard repair',
+        'Office furniture relocation',
+        'Furniture assembly and installation — desks, whiteboards, TV mounts, storage units',
+        'General building maintenance',
+      ],
+    },
+    {
+      title: 'Glass-related',
+      note: 'The same hardware we specify and install, kept working.',
+      items: [
+        'Glass cleaning',
+        'Glass installation and removal',
+        'Design and installation of vinyl — frosted film, manifestation and other applied graphics',
+        'Hardware replacement',
+        'Preventive servicing of hinges, handles, supports, locks and door stops',
+      ],
+    },
+  ],
+  process: [
+    {
+      title: 'Walk-Through',
+      body: 'We walk the floor with you, list what is actually there — square metres, glazed openings, door count, hardware in use — and agree what the plan has to cover.',
+    },
+    {
+      title: 'Plan & Schedule',
+      body: 'Visit frequency, priority tasks and the working windows are fixed in writing, along with the flat fee they sit under.',
+    },
+    {
+      title: 'Service Visit',
+      body: 'Our crew works the agreed window — after hours where the work is disruptive — and leaves the space usable at the end of every visit.',
+    },
+    {
+      title: 'Report & Sign-Off',
+      body: 'You receive the control report and checklist for the visit, with anything found but not yet approved flagged for the next one.',
+    },
+  ],
+  gallery: [
+    {
+      image: 'scenes/office-glass-doors.jpg',
+      label: 'Glazed Office Doors',
+      note: 'The hinges and locks a preventive visit checks first.',
+    },
+    {
+      image: 'projects/clinic-glass-screen.jpg',
+      label: 'Partition Run',
+      note: 'Glazed division where cleaning and vinyl work recur.',
+    },
+    {
+      image: 'projects/gym-stainless-frames.jpg',
+      label: 'Stainless Framing',
+      note: 'Framed glazing serviced on the same schedule.',
+    },
+    {
+      image: 'scenes/tempered-glass-edge.jpg',
+      label: 'Glass Edge',
+      note: 'Edge and fitting condition, logged visit to visit.',
+    },
+  ],
+  cta: {
+    headline: 'Ask for a maintenance walk-through',
+    body: 'Tell us the floor area and how many glazed openings you have, and we will come back with a visit schedule and a monthly figure.',
+  },
+  gaps: [
+    {
+      where: 'Project gallery',
+      needs:
+        'Photographs of the maintenance crew at work — painting, drywall repair, furniture assembly, glass cleaning. The services brief lists five items marked "(imagen)" and no image was supplied for any of them; what is shown here is glass and office reference imagery.',
+    },
+    {
+      where: 'Plan tiers and pricing',
+      needs:
+        'The tier structure behind the flat fee: visit frequency, hours included per visit and the price bands per floor area. The brief states the principle ("tarifa plana fija") without a single number, so the page states the principle too.',
+    },
+    {
+      where: 'Client panel',
+      needs:
+        'The brief promises a "panel directivo" for assigning priority tasks and digital checklists. No such tool exists yet, so the page describes assigning tasks as a service, not as a product a visitor can log into.',
+    },
+  ],
+};
+
+export const verticals: Vertical[] = [commercial, residential, maintenance];
 
 export function getVertical(slug: string): Vertical | undefined {
   return verticals.find((v) => v.slug === slug);
 }
+
+/**
+ * Accepted values for the quote form's "line of work" field.
+ *
+ * The Pages Function imports this rather than keeping its own copy, so adding
+ * a vertical can never leave the server rejecting an option the form offers.
+ */
+export const verticalSlugs = verticals.map((v) => v.slug);
+
+/** Human label for a slug, for the notification email. */
+export const verticalLabel = (slug: string): string =>
+  verticals.find((v) => v.slug === slug)?.nav ?? slug;

@@ -1,0 +1,67 @@
+---
+import SectionHeader from './ui/SectionHeader.astro';
+import MaterialNote from './ui/MaterialNote.astro';
+import type { ServiceGroup } from '../data/verticals';
+
+/**
+ * The covered-work list, group by group.
+ *
+ * Deliberately a list and not a card grid: a facilities manager reads this to
+ * check whether a specific task is in scope, and a list is what you scan for
+ * that. The tick marks echo the drafting motif used elsewhere.
+ */
+interface Props {
+  eyebrow?: string;
+  title: string;
+  lead?: string;
+  groups: ServiceGroup[];
+  gap?: { where: string; needs: string };
+}
+const { eyebrow = 'Scope', title, lead, groups, gap } = Astro.props;
+---
+
+<section id="scope" class="relative bg-paper text-ink py-24 sm:py-32">
+  <div class="mx-auto max-w-7xl px-5 sm:px-8">
+    <SectionHeader eyebrow={eyebrow} title={title} lead={lead} tone="light" class="mb-14" />
+
+    {gap && <MaterialNote where={gap.where} needs={gap.needs} />}
+
+    <div class="grid lg:grid-cols-2 gap-10 lg:gap-16">
+      {
+        groups.map((g, gi) => (
+          <div data-reveal style={`--reveal-delay:${gi * 120}ms`}>
+            <div class="flex items-baseline gap-4 border-b border-ink/12 pb-5">
+              <span class="font-display text-2xl font-semibold text-sand">0{gi + 1}</span>
+              <div>
+                <h3 class="font-display text-xl sm:text-2xl font-semibold text-deep-teal tracking-wide">
+                  {g.title}
+                </h3>
+                <p class="mt-1.5 text-sm leading-relaxed text-ink/55">{g.note}</p>
+              </div>
+            </div>
+
+            <ul class="mt-2">
+              {g.items.map((item) => (
+                <li class="flex items-start gap-4 border-b border-ink/8 py-4">
+                  <svg
+                    width="16"
+                    height="16"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    stroke-width="2.5"
+                    class="mt-1 shrink-0 text-teal"
+                    aria-hidden="true"
+                  >
+                    <path d="M4 12.5 9 17.5 20 6.5" stroke-linecap="round" stroke-linejoin="round" />
+                  </svg>
+                  <span class="text-base leading-relaxed text-ink/75">{item}</span>
+                </li>
+              ))}
+            </ul>
+          </div>
+        ))
+      }
+    </div>
+  </div>
+</section>

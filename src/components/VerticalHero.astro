@@ -7,6 +7,17 @@ interface Props {
   vertical: Vertical;
 }
 const { vertical: v } = Astro.props;
+
+/**
+ * The secondary CTA points at whatever this vertical actually renders below.
+ * It used to be a hard-coded "#technical", which is the plan viewer's id — on a
+ * line that ships no drawings that button scrolled nowhere.
+ */
+const secondary = v.plans?.length
+  ? { href: '#technical', label: 'See the drawings' }
+  : v.serviceGroups?.length
+    ? { href: '#scope', label: 'What we cover' }
+    : { href: '#process', label: 'How we work' };
 ---
 
 <section class="relative isolate min-h-[78svh] lg:min-h-[86svh] flex items-end overflow-hidden bg-ink">
@@ -79,10 +90,10 @@ const { vertical: v } = Astro.props;
           </svg>
         </a>
         <a
-          href="#technical"
+          href={secondary.href}
           class="inline-flex items-center justify-center gap-2 border border-light-teal/40 text-warm-gray font-semibold uppercase tracking-[0.14em] text-[0.82rem] px-7 py-4 hover:border-sand hover:text-sand transition-colors duration-300"
         >
-          See the drawings
+          {secondary.label}
         </a>
       </div>
     </div>

@@ -10,18 +10,20 @@ import ValuesStrip from '../components/ValuesStrip.astro';
 import TaglineMarquee from '../components/TaglineMarquee.astro';
 import CTABand from '../components/ui/CTABand.astro';
 import Footer from '../components/Footer.astro';
-import { commercial, residential } from '../data/verticals';
+import { verticals, commercial } from '../data/verticals';
 
 /**
- * Home is the fork, not the whole story: hero, the two verticals, who we are,
+ * Home is the fork, not the whole story: hero, the lines of work, who we are,
  * what backs the work, a sample of it, and one way to start a conversation.
  * Mission / Vision / Values now live on /about.
  */
-// Alternates the two lines rather than indexing fixed positions: hard-coded
-// indices broke the build the moment a gallery got shorter.
-const featured = Array.from({ length: 3 }, (_, i) => [commercial.gallery[i], residential.gallery[i]])
+// Interleaves every line rather than indexing fixed positions: hard-coded
+// indices broke the build the moment a gallery got shorter, and naming two
+// verticals left the third one out of the home gallery entirely.
+const featured = Array.from({ length: 3 }, (_, i) => verticals.map((v) => v.gallery[i]))
   .flat()
-  .filter((item) => item !== undefined);
+  .filter((item) => item !== undefined)
+  .slice(0, 6);
 ---
 
 <Layout>
@@ -34,7 +36,7 @@ const featured = Array.from({ length: 3 }, (_, i) => [commercial.gallery[i], res
     <ProjectGallery
       eyebrow="Our craft"
       title="Built for visionary projects"
-      lead="Tempered glass and stainless steel, engineered to fit and built to last — across both lines of work."
+      lead="Tempered glass and stainless steel, engineered to fit and built to last — across every line of work."
       items={featured}
       gaps={[commercial.gaps[0]]}
     />
@@ -42,7 +44,7 @@ const featured = Array.from({ length: 3 }, (_, i) => [commercial.gallery[i], res
     <TaglineMarquee />
     <CTABand
       headline="Let's build something made to last"
-      body="Tell us about the project — commercial or residential — and we'll come back with a system, a drawing and a number."
+      body="Tell us about the project — a storefront, a bathroom or a floor to keep running — and we'll come back with a system, a drawing and a number."
     />
   </main>
   <Footer />

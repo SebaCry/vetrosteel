@@ -17,13 +17,15 @@ por vertical de negocio.
 ```
 /              Home — hero, bifurcación de verticales, estudio, capacidades,
                obra destacada, valores, CTA
-/commercial    Vertical comercial   ┐ misma plantilla,
-/residential   Vertical residencial ┘ distinta data
+/commercial    Vertical comercial    ┐
+/residential   Vertical residencial  ├ misma plantilla, distinta data
+/maintenance   Mantenimiento B2B     ┘
+/projects      Obra ejecutada + el arco dibujo → construido
 /about         Estudio completo: about, misión, visión, capacidades, valores
 /quote         Formulario de cotización
 ```
 
-### Añadir una tercera línea de producto
+### Añadir una línea de negocio
 
 Todo lo que define una vertical vive en [`src/data/verticals.ts`](src/data/verticals.ts).
 Añadir una entrada al array `verticals` genera automáticamente:
@@ -31,8 +33,32 @@ Añadir una entrada al array `verticals` genera automáticamente:
 - la página en `/<slug>` (vía [`src/pages/[vertical].astro`](src/pages/[vertical].astro))
 - su URL en el sitemap
 - su opción en el `<select>` del formulario de cotización
+- su nodo `Service` en el JSON-LD
+- su imagen de compartir en `/og/<slug>.png`
+- su aceptación en el endpoint del formulario, que importa `verticalSlugs` en
+  vez de mantener su propia lista
 
-Solo hay que añadirla a mano a `mainNav` en [`src/data/site.ts`](src/data/site.ts).
+A mano quedan dos pasos: `mainNav` / `footerNav` en
+[`src/data/site.ts`](src/data/site.ts) y la entrada en `routeSeo` de
+[`src/data/seo.ts`](src/data/seo.ts) — sin ella la página hereda el `<title>`
+del home.
+
+No toda línea vende ferretería. `products`, `plans` y `planIntro` son
+opcionales; una línea de servicio lleva `programs` y `serviceGroups` en su
+lugar, y la plantilla omite el visor de planos y la parrilla de producto.
+
+### Mantenimiento operativo B2B
+
+`/maintenance` es la línea de suscripción, sacada del brief del cliente
+(`requeriments/servicios.pdf`, "Mantenimiento Operativo B2B"). El brief está en
+español y el sitio en inglés: la copia es esa traducción, no una ampliación.
+Cubre servicios generales (pintura, yeso, mobiliario) y todo lo relacionado con
+vidrio (limpieza, montaje/desmontaje, vinilos esmerilados, cambio de herrajes,
+mantenimiento preventivo de bisagras, manijas, soportes, chapas y topes).
+
+Lo que el brief promete y todavía no existe — panel directivo, tarifas, fotos
+del equipo trabajando — está declarado en `gaps`, no descrito como si estuviera
+hecho.
 
 ### Sistema de componentes
 
@@ -45,6 +71,8 @@ Solo hay que añadirla a mano a `mainNav` en [`src/data/site.ts`](src/data/site.
 | `ui/MaterialNote.astro` | Marca de material pendiente (ver abajo) |
 | `VerticalSplit` | Bifurcación de verticales en el home |
 | `VerticalHero` `CategoryRow` `ProductGrid` `ProcessSteps` `ProjectGallery` | Secciones de vertical, alimentadas por datos |
+| `ProgramGrid` | Los cinco compromisos de la suscripción (líneas de servicio) |
+| `ServiceChecklist` | Alcance cubierto por visita, agrupado (líneas de servicio) |
 | `PlanViewer` | Visor de planos técnicos: zoom, paneo, leyenda, escala |
 | `QuoteForm` | Formulario con validación y estados |
 
@@ -84,11 +112,15 @@ devolverá 404 al enviar. Para probarlo de verdad:
 
 ```bash
 npm run build
-npx wrangler pages dev dist \
+npm run preview:functions -- \
   --binding RESEND_API_KEY=re_xxx \
   --binding QUOTE_TO=contact@vetrosteelut.com \
   --binding "QUOTE_FROM=Vetro Steel <quotes@vetrosteelut.com>"
 ```
+
+Wrangler está en `devDependencies`, así que no hace falta `npx` a un paquete
+remoto. Sin `RESEND_API_KEY` válida el endpoint responde 502 y el formulario lo
+dice — es la señal de que la clave falta, no de que el código esté roto.
 
 ### Capturas de verificación
 
@@ -129,6 +161,14 @@ Lo que falta hoy:
    por herraje. Los acabados listados se leyeron de la fotografía del catálogo.
 4. **Pares antes/después** de un mismo baño. El componente comparador no se
    construyó: emparejar fotos no relacionadas sería inventar.
+5. **Fotografía de mantenimiento.** El brief de servicios marca cinco puntos con
+   "(imagen)" y no llegó ninguna: pintura, reparación de yeso, movimiento de
+   mobiliario, montaje e instalación, mantenimiento general.
+6. **Tarifas del plan de mantenimiento**: frecuencia de visita, horas incluidas
+   y bandas de precio por superficie. El brief afirma "tarifa plana fija" sin un
+   solo número, así que la página afirma el principio y nada más.
+7. **Panel directivo** para asignar tareas prioritarias. El brief lo promete;
+   no existe, así que se describe como servicio, no como producto.
 
 ---
 
@@ -145,14 +185,36 @@ parte del build de Astro.
 
 ### Variables de entorno (Settings → Variables and Secrets)
 
-| Variable | Uso |
-| -------- | --- |
-| `RESEND_API_KEY` | API key de [Resend](https://resend.com) |
-| `QUOTE_TO` | Buzón que recibe las solicitudes |
-| `QUOTE_FROM` | Remitente verificado, p. ej. `Vetro Steel <quotes@vetrosteelut.com>` |
+| Variable | Obligatoria | Uso |
+| -------- | ----------- | --- |
+| `RESEND_API_KEY` | sí | API key de [Resend](https://resend.com) |
+| `QUOTE_TO` | sí | Buzón que recibe las solicitudes |
+| `QUOTE_FROM` | sí | Remitente verificado, p. ej. `Vetro Steel <quotes@vetrosteelut.com>` |
+| `QUOTE_BCC` | no | Segundo buzón en copia oculta de cada solicitud |
+| `QUOTE_REPLY_TO` | no | Dirección a la que responde el acuse del visitante (por defecto `QUOTE_TO`) |
 
-Sin ellas el endpoint responde **503** y el formulario le dice al visitante que
-escriba por email, en vez de tragarse el lead en silencio.
+Sin las tres obligatorias el endpoint responde **503** y el formulario le dice
+al visitante que escriba por email, en vez de tragarse el lead en silencio.
+
+### Poner el correo en marcha (Resend)
+
+1. Crear cuenta en [resend.com](https://resend.com) y en **Domains** añadir
+   `vetrosteelut.com`.
+2. Resend entrega tres registros DNS (SPF/`MX` de retorno y dos DKIM). Cargarlos
+   en el DNS del dominio — si está en Cloudflare, en **DNS → Records**, con el
+   proxy **desactivado** (nube gris). Sin dominio verificado Resend solo deja
+   enviar a la dirección de la propia cuenta.
+3. **API Keys → Create**, permiso *Sending access*. La clave se ve una sola vez.
+4. En el proyecto de Pages: **Settings → Variables and Secrets**, añadir las
+   tres variables. `RESEND_API_KEY` como **Secret**, las otras como texto.
+   Marcarlas para *Production* y *Preview*.
+5. Re-desplegar (las variables no se aplican al build ya publicado) y enviar una
+   solicitud de prueba desde `/quote`.
+
+Cada envío correcto manda **dos correos**: la notificación interna a `QUOTE_TO`
+(con `reply_to` puesto al visitante, así que basta responder) y un acuse de
+recibo al visitante. El acuse se envía después de decidir la respuesta HTTP: si
+rebota, el lead ya está a salvo en la bandeja y el fallo solo queda en el log.
 
 Respuestas del endpoint: `400` JSON inválido · `405` método distinto de POST ·
 `422` validación con errores por campo · `502` fallo de entrega · `503` sin
@@ -181,7 +243,9 @@ en silencio).
 src/
 ├─ data/
 │  ├─ site.ts                  # identidad, contacto, navegación
-│  └─ verticals.ts             # LAS DOS VERTICALES: copy, producto, planos, proceso, huecos
+│  ├─ seo.ts                   # tabla de metadatos por ruta, FAQ y grafo JSON-LD
+│  ├─ showcase.ts              # material de /projects (clips generados vs. obra real)
+│  └─ verticals.ts             # LAS VERTICALES: copy, producto, planos, proceso, huecos
 ├─ lib/images.ts               # resolución de assets por clave
 ├─ assets/                     # fotografía y planos del catálogo (pasa por astro:assets)
 │  ├─ scenes/  products/  plans/

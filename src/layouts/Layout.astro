@@ -148,7 +148,11 @@ const { title, description, breadcrumbs, includeFaq, noindex } = Astro.props;
         const target = document.querySelector(id);
         if (!target) return;
         e.preventDefault();
-        lenis.scrollTo(target as HTMLElement, { offset: -96 });
+        // Measured, not assumed: the bar is 113px on desktop and 72px on a
+        // phone, and a fixed -96 put desktop targets underneath it.
+        const bar = document.getElementById('site-nav');
+        const offset = -((bar?.getBoundingClientRect().height ?? 96) + 16);
+        lenis.scrollTo(target as HTMLElement, { offset });
         history.pushState(null, '', id);
       });
     </script>
