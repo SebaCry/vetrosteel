@@ -25,6 +25,7 @@ Test the quote endpoint (12 cases against the real handler — no emulator, no V
 ```bash
 npm run test:quote                        # no key: the three "valid" rows expect 502
 RESEND_API_KEY=re_xxx npm run test:quote  # real key: expects 200 and actually sends mail
+# test:quote also loads .env if present (see .env.example). Vercel never reads .env.
 ```
 
 A fake key exercises everything but delivery: 502 with `Resend 401` in the log proves the request reached
@@ -47,10 +48,13 @@ Two files hold nearly all content:
   `maintenance`). Adding an entry to the `verticals` array automatically produces the page (via
   [src/pages/[vertical].astro](src/pages/[vertical].astro)), its sitemap URL, its `Service` node in the
   JSON-LD graph, its `/og/<slug>.png` share image, its option in the quote form's `<select>` and its
-  acceptance by the Pages Function (which imports `verticalSlugs` rather than keeping its own list).
-  The manual steps are `mainNav`/`footerNav` in [src/data/site.ts](src/data/site.ts) **and** a `routeSeo`
-  entry in [src/data/seo.ts](src/data/seo.ts) — without the latter the page silently inherits the home
-  page's title and description.
+  The manual steps are `mainNav`/`footerNav` in [src/data/site.ts](src/data/site.ts), a `routeSeo`
+  entry in [src/data/seo.ts](src/data/seo.ts) — without it the page silently inherits the home page's
+  title and description — and the `LINES` map in `api/quote.ts` (`npm run test:quote` catches a miss).
+
+  **Images: one photo, once per page.** The client flagged repetition. Several assets are the same photo under
+  two names (see the comment above `commercial` in verticals.ts), so check that list, not just filenames. The
+  grayscale `duotone` treatment was removed site-wide at the client's request for more vivid photography.
 
   Not every line sells hardware: `products`, `plans` and `planIntro` are optional, and a service line
   carries `programs` + `serviceGroups` instead (rendered by `ProgramGrid` and `ServiceChecklist`). The
@@ -117,11 +121,12 @@ button need ~990px beside the lockup, and at `md` the button fell off the right 
 
 ### Quote form
 
-The logic is in [src/lib/quote.ts](src/lib/quote.ts) as a plain `handleQuote(request, env)` —
-[api/quote.ts](api/quote.ts) is a five-line Vercel adapter over it. That split exists so the endpoint can be
-tested without an emulator (`npm run test:quote`); keep new logic in the lib, not the adapter. Vercel deploys
-anything in the root `api/` directory as a function with no `vercel.json` entry, and the Web-standard `fetch`
-export means it is Request → Response throughout.
+Everything lives in [api/quote.ts](api/quote.ts): an exported `handleQuote(request, env)` plus the default
+Web-standard `fetch` export Vercel deploys. **That file must not have relative imports.** Vercel compiles
+each function file to ESM on its own, so an extensionless `import '../src/…'` fails to resolve at load time
+and every request dies with `500 FUNCTION_INVOCATION_FAILED` — that shipped once. It therefore carries its
+own `LINES` (slug → label) map; `npm run test:quote` imports both it and `src/data/verticals.ts` and fails
+if they drift, so a new vertical must be added there too.
 
 Validates, honeypots (`website` field → silent `200`), and relays through Resend. Requires `RESEND_API_KEY`,
 `QUOTE_TO`, `QUOTE_FROM` (optional: `QUOTE_BCC`, `QUOTE_REPLY_TO`); without the required three it returns
@@ -131,9 +136,7 @@ unconfigured · `200` ok.
 
 Two emails go out per accepted request: the internal notification (`reply_to` set to the visitor) decides
 the HTTP response, and the visitor's acknowledgement is awaited afterwards with its own `.catch` — a bounced
-acknowledgement must never turn a captured lead into an error the visitor sees. It imports from
-`src/data/verticals`, which is what keeps the accepted `vertical` values in step with the options the form
-renders.
+acknowledgement must never turn a captured lead into an error the visitor sees.
 
 ## Material gaps
 

@@ -1,4 +1,5 @@
-import { handleQuote } from '../src/lib/quote.ts';
+import { handleQuote, LINES } from '../api/quote.ts';
+import { verticals } from '../src/data/verticals.ts';
 
 /**
  * Exercises every branch of the quote endpoint against the real handler.
@@ -6,7 +7,7 @@ import { handleQuote } from '../src/lib/quote.ts';
  * There is no local emulator for a Vercel Function, and `vercel dev` needs the
  * CLI and a linked project — so the handler is written as plain
  * Request → Response and checked here instead. Run it after touching
- * src/lib/quote.ts:
+ * api/quote.ts:
  *
  *   npm run test:quote                 # no key: delivery is expected to fail
  *   RESEND_API_KEY=re_… npm run test:quote   # real key: actually sends
@@ -47,6 +48,7 @@ const cases = [
   ['empty submission', 422, {}],
   ['bad email', 422, { ...good, email: 'nope' }],
   ['unknown line of work', 422, { ...good, vertical: 'skylights' }],
+  ['prototype key as line of work', 422, { ...good, vertical: 'toString' }],
   ['message too short', 422, { ...good, message: 'hi' }],
   ['name over the limit', 422, { ...good, name: 'x'.repeat(200) }],
   ['honeypot filled, dropped silently', 200, { ...good, website: 'http://spam.example' }],
@@ -58,6 +60,13 @@ const cases = [
 
 const real = Boolean(process.env.RESEND_API_KEY);
 let failed = 0;
+
+// api/quote.ts cannot import the site's data (see its header), so its copy of
+// the lines of work is checked against the source of truth here.
+const site = Object.fromEntries(verticals.map((v) => [v.slug, v.nav]));
+const drift = JSON.stringify(site) !== JSON.stringify(LINES);
+if (drift) failed++;
+console.log(`${drift ? '  FAIL' : '  ok  '} ---- LINES matches src/data/verticals.ts${drift ? `  (site ${JSON.stringify(site)})` : ''}`);
 
 for (const [label, expected, body, method, envOverride] of cases) {
   const res = await handleQuote(req(body, method), envOverride ?? env);

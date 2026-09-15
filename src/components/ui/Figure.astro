@@ -18,7 +18,6 @@ interface Props {
   sizes?: string;
   widths?: number[];
   eager?: boolean;
-  duotone?: boolean;
   parallax?: boolean;
   fit?: 'cover' | 'contain';
   class?: string;
@@ -33,7 +32,6 @@ const {
   sizes = '(min-width:1280px) 30vw, (min-width:768px) 45vw, 92vw',
   widths = [400, 700, 1000, 1400],
   eager = false,
-  duotone = false,
   parallax = false,
   fit = 'cover',
   class: className = '',
@@ -63,7 +61,7 @@ const safeWidths = [...new Set(widths.filter((w) => w <= maxWidth).concat(Math.m
     decoding={eager ? 'sync' : 'async'}
     fetchpriority={eager ? 'high' : 'auto'}
     data-parallax={parallax ? '' : undefined}
-    class={`w-full h-full ${fitClass} ${duotone ? 'duotone' : ''} ${parallax ? 'parallax-img' : ''} ${imgClass}`}
+    class={`w-full h-full ${fitClass} ${parallax ? 'parallax-img' : ''} ${imgClass}`}
   />
   <slot />
 </div>

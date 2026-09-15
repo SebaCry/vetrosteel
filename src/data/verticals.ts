@@ -23,12 +23,15 @@ export interface ProductItem {
 }
 
 export interface CategoryItem {
+  /** Lucide icon name, as astro-icon expects it. */
+  icon: string;
   title: string;
   body: string;
   image: string;
 }
 
 export interface ProcessStep {
+  icon: string;
   title: string;
   body: string;
 }
@@ -65,7 +68,7 @@ export interface ProgramItem {
 export interface ServiceGroup {
   title: string;
   note: string;
-  items: string[];
+  items: ProgramItem[];
 }
 
 export interface Vertical {
@@ -93,6 +96,21 @@ export interface Vertical {
 }
 
 const PROCESS_TITLES = ['Consultation', 'Field Measurement', 'Fabrication', 'Installation'] as const;
+const PROCESS_ICONS = ['lucide:messages-square', 'lucide:ruler', 'lucide:factory', 'lucide:wrench'] as const;
+
+/*
+ * Image allocation. No photograph appears twice on one page, and the home page
+ * (hero-card per line + featured galleries) is unique across all of it. Some
+ * assets are the same photo under two names — curtain-wall-facade and
+ * storefront-entrance, bath-fixed-panel and bath-walkin-modern,
+ * glass-roof-structure and skylight-structure, bath-tub-screen-brass and
+ * tub-screen-gold, railing-exterior-stair and railing-glass-brass — so only one
+ * of each pair is used. Client feedback: "the images repeat several times".
+ *
+ * The three hero images under renders/ were supplied by the client and are
+ * AI-generated (cropped to remove the Gemini sparkle). They are used as hero
+ * backdrops only — never in a "Selected work" gallery, which shows real jobs.
+ */
 
 export const commercial: Vertical = {
   slug: 'commercial',
@@ -100,33 +118,35 @@ export const commercial: Vertical = {
   eyebrow: 'Commercial',
   headline: 'Glass systems that hold a building open',
   lead:
-    'Entrance systems, office partitions and railings in tempered glass and stainless steel — specified, fabricated and installed as one package.',
+    'Entrances, office partitions and railings in glass and stainless steel — designed and installed as one package.',
   hero: {
-    image: 'scenes/storefront-entrance.jpg',
-    alt: 'Commercial storefront in structural glass with stainless steel entrance framing',
+    image: 'renders/glass-conference-room.jpg',
+    alt: 'Frameless glass conference room with stainless spider fittings overlooking the mountains',
   },
   intro: {
     title: 'Built for occupied buildings',
     body: [
-      'Commercial work is measured in tolerances and in schedule. A partition that arrives 3mm out is a partition that goes back on the truck, and an entrance that cannot be re-hung on a Friday afternoon is a tenant without a door on Monday.',
-      'We carry the whole chain — hardware specification, shop drawings, fabrication and installation — so the responsibility for fit sits in one place instead of being negotiated between three vendors on site.',
+      'Specification, shop drawings, fabrication and installation from one team — so responsibility for fit sits in one place, not between three vendors on site.',
     ],
   },
   categories: [
     {
+      icon: 'lucide:door-open',
       title: 'Entrance Systems',
-      body: 'Storefront doors, patch fittings and floor-spring assemblies for all-glass entrances that take daily traffic without sagging.',
-      image: 'scenes/storefront-entrance.jpg',
-    },
-    {
-      title: 'Office Partitions & Framing',
-      body: 'Glass office divisions with stainless and aluminium framing — meeting rooms, workstation runs and full-height demountable walls.',
+      body: 'All-glass storefront doors and patch fittings built for daily traffic.',
       image: 'scenes/office-glass-doors.jpg',
     },
     {
+      icon: 'lucide:layout-panel-left',
+      title: 'Office Partitions',
+      body: 'Glass meeting rooms, workstation runs and full-height walls.',
+      image: 'projects/curved-glass-partition.jpg',
+    },
+    {
+      icon: 'lucide:fence',
       title: 'Railings & Guardrails',
-      body: 'Spigot, U-channel and post-mounted glass railing systems for stairs, mezzanines, balconies and roof terraces.',
-      image: 'scenes/railing-exterior-stair.jpg',
+      body: 'Spigot, channel and post-mounted glass for stairs, balconies and terraces.',
+      image: 'projects/facade-balcony-railing.jpg',
     },
   ],
   products: [
@@ -248,43 +268,31 @@ export const commercial: Vertical = {
     },
   ],
   process: [
-    {
-      title: PROCESS_TITLES[0],
-      body: 'We review drawings or the space itself, agree the system — framed, frameless, spigot or channel — and confirm hardware, finish and glass make-up before a quote goes out.',
-    },
-    {
-      title: PROCESS_TITLES[1],
-      body: 'We measure on site once the opening is built, not from the architectural set. Openings move; templates are cut to what is actually there.',
-    },
-    {
-      title: PROCESS_TITLES[2],
-      body: 'Glass is cut, tempered and processed to the templates in this section. Hardware is prepared and dry-fitted before it leaves the shop.',
-    },
-    {
-      title: PROCESS_TITLES[3],
-      body: 'Installed by our own crew, sequenced around the trades still working around us, with adjustment and hand-over on the same visit.',
-    },
+    { icon: PROCESS_ICONS[0], title: PROCESS_TITLES[0], body: 'We review the drawings or the space and agree the system before quoting.' },
+    { icon: PROCESS_ICONS[1], title: PROCESS_TITLES[1], body: 'Measured on site once the opening is built — not from the plans.' },
+    { icon: PROCESS_ICONS[2], title: PROCESS_TITLES[2], body: 'Glass cut and tempered to template; hardware dry-fitted in the shop.' },
+    { icon: PROCESS_ICONS[3], title: PROCESS_TITLES[3], body: 'Installed and adjusted by our own crew, handed over the same visit.' },
   ],
   gallery: [
-    {
-      image: 'scenes/curtain-wall-facade.jpg',
-      label: 'Curtain Wall',
-      note: 'Structural glass envelope over a steel frame.',
-    },
     {
       image: 'scenes/skylight-structure.jpg',
       label: 'Skylight Structure',
       note: 'Framed glass roof engineered for light and load.',
     },
     {
-      image: 'scenes/glass-roof-structure.jpg',
-      label: 'Glass Roof Structure',
-      note: 'Spider-fixed glazing over a steel space frame.',
+      image: 'projects/spiral-stair-glass.jpg',
+      label: 'Spiral Stair',
+      note: 'Glass balustrade following a curved stair.',
     },
     {
-      image: 'scenes/railing-glass-brass.jpg',
-      label: 'Guardrail Detail',
-      note: 'Glass-to-handrail junction at the stair return.',
+      image: 'projects/rooftop-railing-city.jpg',
+      label: 'Rooftop Terrace',
+      note: 'Post-and-glass guardrail on a city terrace.',
+    },
+    {
+      image: 'projects/display-case-glass.jpg',
+      label: 'Display Case',
+      note: 'Frameless glass case on stainless fittings.',
     },
   ],
   cta: {
@@ -316,32 +324,34 @@ export const residential: Vertical = {
   eyebrow: 'Residential',
   headline: 'Bath enclosures, down to the hinge',
   lead:
-    'Shower hardware, sliding systems and glass railing for the home — where the fitting is at eye level and the finish has to survive being touched every day.',
+    'Shower enclosures, sliding systems and glass railings for the home, with hardware built for daily use.',
   hero: {
-    image: 'scenes/bath-walkin-modern.jpg',
-    alt: 'Contemporary bathroom with a frameless glass shower enclosure and stainless fittings',
+    image: 'renders/shower-sliding-matte-black.jpg',
+    alt: 'Frameless glass shower enclosure with a matte black sliding track',
   },
   intro: {
     title: 'The hardware is the detail',
     body: [
-      'In a bathroom nobody stands back to admire the elevation. They stand at arm\'s length from a hinge, and they touch it twice a day. So the argument is made close up: how the plate meets the glass, whether the finish matches the tapware, whether the door still closes true in year three.',
-      'We specify to the fitting rather than to the opening — hinge, clamp, knob and roller chosen for the glass thickness and the way the door will actually be used, then cut to the templates that hardware requires.',
+      'Hinge, clamp, knob and roller chosen for your glass and the way the door is used — with a finish that matches your fixtures and still closes true years later.',
     ],
   },
   categories: [
     {
+      icon: 'lucide:shower-head',
       title: 'Shower Hardware',
-      body: 'Wall-mount and glass-to-glass hinges, clamps, knobs and support bars for frameless and semi-frameless enclosures.',
-      image: 'scenes/bath-fixed-panel.jpg',
+      body: 'Hinges, clamps, knobs and support bars for frameless enclosures.',
+      image: 'scenes/shower-enclosure-stone.jpg',
     },
     {
+      icon: 'lucide:move-horizontal',
       title: 'Sliding Systems',
-      body: 'Barn-style and bypass sliding shower kits — track, rollers, stops and guides supplied as a matched set.',
+      body: 'Barn-style and bypass kits — track, rollers and guides as one set.',
       image: 'scenes/shower-sliding-black.jpg',
     },
     {
+      icon: 'lucide:bath',
       title: 'Bath Screens & Railings',
-      body: 'Over-bath screens and interior glass railing in the same finish family as the enclosure hardware.',
+      body: 'Over-bath screens and interior glass railing in a matching finish.',
       image: 'scenes/tub-screen-gold.jpg',
     },
   ],
@@ -458,43 +468,31 @@ export const residential: Vertical = {
     },
   ],
   process: [
-    {
-      title: PROCESS_TITLES[0],
-      body: 'We look at the bathroom — or the drawing — and settle the layout, the glass thickness and the finish, matching the hardware to the tapware you have already chosen.',
-    },
-    {
-      title: PROCESS_TITLES[1],
-      body: 'We measure after tiling, never before. A shower opening tapers; the enclosure is cut to the opening that exists, plumb checked corner to corner.',
-    },
-    {
-      title: PROCESS_TITLES[2],
-      body: 'Glass is cut, notched to the hinge templates, polished and toughened. Hardware is matched as a set so finishes come from one batch.',
-    },
-    {
-      title: PROCESS_TITLES[3],
-      body: 'Installed, sealed and adjusted so the door holds where you leave it — typically inside a day, with the bathroom usable that evening.',
-    },
+    { icon: PROCESS_ICONS[0], title: PROCESS_TITLES[0], body: 'We settle layout, glass and finish to match your fixtures.' },
+    { icon: PROCESS_ICONS[1], title: PROCESS_TITLES[1], body: 'Measured after tiling, so the glass fits the real opening.' },
+    { icon: PROCESS_ICONS[2], title: PROCESS_TITLES[2], body: 'Glass cut, notched and tempered; hardware matched as one set.' },
+    { icon: PROCESS_ICONS[3], title: PROCESS_TITLES[3], body: 'Typically installed in a day — usable that same evening.' },
   ],
   gallery: [
     {
-      image: 'scenes/bath-walkin-modern.jpg',
-      label: 'Walk-In Enclosure',
-      note: 'Fixed panel with a slim stainless support bar.',
+      image: 'scenes/shower-marble-sliding.jpg',
+      label: 'Marble Sliding Enclosure',
+      note: 'Sliding glass door against full-height marble.',
     },
     {
-      image: 'scenes/shower-sliding-black.jpg',
-      label: 'Sliding Shower Door',
-      note: 'Barn-style track in matte black over textured glass.',
+      image: 'scenes/railing-glass-brass.jpg',
+      label: 'Garden Stair Railing',
+      note: 'Glass guardrail with a brass handrail.',
     },
     {
-      image: 'scenes/tub-screen-gold.jpg',
-      label: 'Over-Bath Screen',
-      note: 'Bath screen with brass track and brackets.',
+      image: 'projects/stair-handrail-interior.jpg',
+      label: 'Interior Stair',
+      note: 'Stainless handrail over timber treads.',
     },
     {
-      image: 'scenes/bath-tub-screen-brass.jpg',
-      label: 'Over-Bath Screen, Brass',
-      note: 'Sliding bath screen on a brass track, against full-height tile.',
+      image: 'projects/deck-railing-lakeside.jpg',
+      label: 'Lakeside Deck',
+      note: 'Post-mounted glass railing on a timber deck.',
     },
   ],
   cta: {
@@ -536,137 +534,118 @@ export const maintenance: Vertical = {
   slug: 'maintenance',
   nav: 'Maintenance',
   eyebrow: 'Maintenance',
-  headline: 'Your building, held at premium level',
+  headline: 'Office maintenance, on a flat monthly fee',
   lead:
-    'A subscription maintenance programme for commercial offices — scheduled trades, preventive glass and hardware servicing, and a written record of every visit.',
+    'Painting, drywall, furniture and glass servicing for your offices — scheduled around your team, with a report after every visit.',
   hero: {
-    image: 'scenes/office-glass-doors.jpg',
-    alt: 'Office interior with glass partition doors and stainless hardware',
+    image: 'renders/maintenance-crew.jpg',
+    alt: 'Maintenance crew painting, moving furniture and applying frosted vinyl in an office',
   },
   intro: {
-    title: 'The work between the projects',
+    title: 'One partner for the whole floor',
     body: [
-      'An office does not fail all at once. It degrades — a scuffed wall here, a door that drops on its hinges, a partition left with the last tenant\'s vinyl on it. Each item is too small to raise a purchase order for, and together they are what makes a floor look tired.',
-      'So we take them on a subscription instead: a technical partner on a fixed monthly fee, coordinating painting, drywall, furniture and glass servicing around your operation rather than interrupting it. One vendor, one schedule, one invoice.',
+      'Small repairs add up. We take them on a monthly plan: one vendor, one schedule, one invoice — and no interruptions to your operation.',
     ],
   },
+  // Not rendered for a service line (the service list replaces the category
+  // row); kept because the JSON-LD Service node lists these as its offers.
   categories: [
     {
-      title: 'Scheduled Trades',
-      body: 'Painting and touch-up, drywall repair, basic electrical and space redistribution — booked into the window you choose, not the one that suits us.',
+      icon: 'lucide:paint-roller',
+      title: 'General Services',
+      body: 'Painting, drywall repair, furniture relocation, assembly and installation.',
       image: 'projects/clinic-partition-blue.jpg',
     },
     {
+      icon: 'lucide:sparkles',
       title: 'Glass & Hardware Servicing',
-      body: 'Cleaning, installation and removal of glazing, vinyl work, hardware replacement and preventive servicing of the fittings that move every day.',
-      image: 'scenes/tempered-glass-edge.jpg',
-    },
-    {
-      title: 'Furniture & Fit-Out',
-      body: 'Relocation, assembly and installation of office furniture — desks, whiteboards, screen mounts and storage — including reconfiguration between teams.',
-      image: 'scenes/office-glass-doors.jpg',
+      body: 'Glass cleaning, installation and removal, vinyl, hardware replacement and preventive servicing.',
+      image: 'projects/clinic-glass-screen.jpg',
     },
   ],
   programs: [
     {
       icon: 'lucide:calendar-clock',
-      title: 'Intelligent Scheduling',
-      body: 'You pick the exact window. We coordinate recurring visits for painting, carpentry, basic electrical and space redistribution without interrupting your team\'s operation.',
+      title: 'Smart Scheduling',
+      body: 'You choose the time. Visits never interrupt your team.',
     },
     {
       icon: 'lucide:target',
-      title: 'Managed by Objective, or Preventive',
-      body: 'Assign priority tasks yourself, or let us run our own technical protocol — a full walk-and-check of the floor on every inspection.',
+      title: 'Priorities or Preventive',
+      body: 'Assign the tasks yourself, or let us run our inspection protocol.',
     },
     {
       icon: 'lucide:clipboard-check',
-      title: 'Digital Audit & Inspection',
-      body: 'Every visit closes with a control report and a completed checklist, so each square metre stays traceable rather than remembered.',
+      title: 'Report After Every Visit',
+      body: 'A control report and completed checklist, every time.',
     },
     {
       icon: 'lucide:wallet',
-      title: 'Predictable Operating Costs',
-      body: 'A flat monthly fee to budget against. No financial surprises, no hidden costs and no unexpected invoices at the end of a quarter.',
+      title: 'Flat Monthly Fee',
+      body: 'Predictable costs. No hidden charges or surprise invoices.',
     },
     {
       icon: 'lucide:zap',
       title: 'Special Projects on Demand',
-      body: 'Remodelling, fast adaptations or corporate events outside the usual plan, taken on with priority attention and outside the standing schedule.',
+      body: 'Remodels, quick adaptations or corporate events, with priority.',
     },
   ],
   serviceGroups: [
     {
       title: 'General services',
-      note: 'The trades that keep a floor presentable between fit-outs.',
+      note: 'Keeping the floor presentable.',
       items: [
-        'General painting and touch-up',
-        'Drywall and plasterboard repair',
-        'Office furniture relocation',
-        'Furniture assembly and installation — desks, whiteboards, TV mounts, storage units',
-        'General building maintenance',
+        { icon: 'lucide:paint-roller', title: 'Painting & Touch-Up', body: 'General painting and touch-up of walls and trim.' },
+        { icon: 'lucide:hammer', title: 'Drywall Repair', body: 'Patching and repair of drywall partitions.' },
+        { icon: 'lucide:truck', title: 'Furniture Relocation', body: 'Moving office furniture between rooms and floors.' },
+        { icon: 'lucide:armchair', title: 'Furniture Assembly & Installation', body: 'Desks, whiteboards, TV mounts and storage units.' },
+        { icon: 'lucide:wrench', title: 'General Maintenance', body: 'The everyday repairs a working office needs.' },
       ],
     },
     {
       title: 'Glass-related',
-      note: 'The same hardware we specify and install, kept working.',
+      note: 'The hardware we install, kept working.',
       items: [
-        'Glass cleaning',
-        'Glass installation and removal',
-        'Design and installation of vinyl — frosted film, manifestation and other applied graphics',
-        'Hardware replacement',
-        'Preventive servicing of hinges, handles, supports, locks and door stops',
+        { icon: 'lucide:sparkles', title: 'Glass Cleaning', body: 'Partitions, doors and glazed surfaces.' },
+        { icon: 'lucide:panels-top-left', title: 'Glass Installation & Removal', body: 'Fitting and taking down glass panels.' },
+        { icon: 'lucide:sticker', title: 'Vinyl Design & Installation', body: 'Frosted film and other applied vinyl graphics.' },
+        { icon: 'lucide:key-round', title: 'Hardware Replacement', body: 'Swapping worn or broken glass hardware.' },
+        { icon: 'lucide:shield-check', title: 'Preventive Servicing', body: 'Hinges, handles, supports, locks and door stops.' },
       ],
     },
   ],
   process: [
-    {
-      title: 'Walk-Through',
-      body: 'We walk the floor with you, list what is actually there — square metres, glazed openings, door count, hardware in use — and agree what the plan has to cover.',
-    },
-    {
-      title: 'Plan & Schedule',
-      body: 'Visit frequency, priority tasks and the working windows are fixed in writing, along with the flat fee they sit under.',
-    },
-    {
-      title: 'Service Visit',
-      body: 'Our crew works the agreed window — after hours where the work is disruptive — and leaves the space usable at the end of every visit.',
-    },
-    {
-      title: 'Report & Sign-Off',
-      body: 'You receive the control report and checklist for the visit, with anything found but not yet approved flagged for the next one.',
-    },
+    { icon: 'lucide:clipboard-list', title: 'Walk-Through', body: 'We tour the floor with you and agree what the plan covers.' },
+    { icon: 'lucide:calendar-check', title: 'Plan & Schedule', body: 'Frequency, priorities and time windows fixed in writing.' },
+    { icon: 'lucide:hard-hat', title: 'Service Visit', body: 'Our crew works the agreed window — after hours if needed.' },
+    { icon: 'lucide:file-check', title: 'Report & Sign-Off', body: 'You get the report and checklist for every visit.' },
   ],
   gallery: [
     {
-      image: 'scenes/office-glass-doors.jpg',
-      label: 'Glazed Office Doors',
-      note: 'The hinges and locks a preventive visit checks first.',
+      image: 'projects/clinic-glass-screen.jpg',
+      label: 'Clinic Glass Screen',
+      note: 'Glazed division kept clean and serviced.',
     },
     {
-      image: 'projects/clinic-glass-screen.jpg',
-      label: 'Partition Run',
-      note: 'Glazed division where cleaning and vinyl work recur.',
+      image: 'scenes/office-glass-doors.jpg',
+      label: 'Glazed Office Doors',
+      note: 'Hinges and locks checked on every visit.',
     },
     {
       image: 'projects/gym-stainless-frames.jpg',
       label: 'Stainless Framing',
-      note: 'Framed glazing serviced on the same schedule.',
-    },
-    {
-      image: 'scenes/tempered-glass-edge.jpg',
-      label: 'Glass Edge',
-      note: 'Edge and fitting condition, logged visit to visit.',
+      note: 'Steel and glass maintained on the same plan.',
     },
   ],
   cta: {
     headline: 'Ask for a maintenance walk-through',
-    body: 'Tell us the floor area and how many glazed openings you have, and we will come back with a visit schedule and a monthly figure.',
+    body: 'Tell us your floor area and we will come back with a visit schedule and a monthly figure.',
   },
   gaps: [
     {
       where: 'Project gallery',
       needs:
-        'Photographs of the maintenance crew at work — painting, drywall repair, furniture assembly, glass cleaning. The services brief lists five items marked "(imagen)" and no image was supplied for any of them; what is shown here is glass and office reference imagery.',
+        'Photographs of the maintenance crew at work — painting, drywall repair, furniture assembly, glass cleaning. The hero is an AI-generated illustration supplied by the client; real photographs of completed maintenance work are still needed for this gallery.',
     },
     {
       where: 'Plan tiers and pricing',

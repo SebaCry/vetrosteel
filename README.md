@@ -110,14 +110,17 @@ npm run test:quote # ejercita el endpoint del formulario
 
 **Ojo:** ni `astro dev` ni `astro preview` ejecutan la función de `/api/quote`
 — es una Vercel Function, no una ruta de Astro, así que en local el formulario
-devuelve 404 al enviar. Por eso toda la lógica vive en
-[`src/lib/quote.ts`](src/lib/quote.ts) como `Request → Response` puro, y
-`api/quote.ts` es solo el adaptador: `npm run test:quote` la prueba entera sin
-emulador ni CLI.
+devuelve 404 al enviar. `api/quote.ts` exporta el handler como `Request →
+Response` puro, así que `npm run test:quote` lo prueba entero sin emulador ni
+CLI. **Ese archivo no puede tener imports relativos**: Vercel compila cada
+función a ESM por separado y un import sin extensión revienta la función con
+`500 FUNCTION_INVOCATION_FAILED`. Por eso lleva su propia lista de líneas de
+negocio, y el test falla si se desincroniza de `src/data/verticals.ts`.
 
 ```bash
 npm run test:quote                        # 12 casos; sin clave, el envío falla (502) a propósito
 RESEND_API_KEY=re_xxx npm run test:quote  # con clave real: manda correo de verdad
+cp .env.example .env                      # o poner las claves en .env: test:quote lo lee solo
 ```
 
 Sin `RESEND_API_KEY` válida el endpoint responde 502 y el formulario lo dice —
@@ -210,11 +213,27 @@ al visitante que escriba por email, en vez de tragarse el lead en silencio.
 
 ### Poner el correo en marcha (Resend)
 
+**Antes que nada: `vetrosteelut.com` no tiene registro MX** (verificado el
+2026-09-15). O sea que `contact@vetrosteelut.com` — el correo que muestra todo
+el sitio y el `QUOTE_TO` por defecto — **no puede recibir correo**: rebota.
+Hay que crear el buzón (Google Workspace, Zoho Mail o un reenvío tipo
+ImprovMX hacia un Gmail) o usar otra dirección en `QUOTE_TO` y `site.email`.
+
+`.env` solo sirve para `npm run test:quote` en local (está en `.gitignore`;
+plantilla en [`.env.example`](.env.example)). **Vercel no lo lee**: en
+producción las variables van en el panel de Vercel.
+
+Para probar antes de verificar el dominio: `QUOTE_FROM="Vetro Steel
+<onboarding@resend.dev>"` y `QUOTE_TO` = el correo de la cuenta de Resend.
+Llega la notificación; el acuse al visitante falla (Resend solo deja escribir
+a la cuenta propia sin dominio verificado) y queda en el log, sin afectar al
+lead.
+
 1. Crear cuenta en [resend.com](https://resend.com) y en **Domains** añadir
    `vetrosteelut.com`.
 2. Resend entrega tres registros DNS (SPF/`MX` de retorno y dos DKIM). Cargarlos
-   donde esté el DNS de `vetrosteelut.com` — hoy el dominio apunta a Vercel, así
-   que si el DNS también está allí van en **Vercel → Domains →
+   donde esté el DNS de `vetrosteelut.com` — sus nameservers son
+   `ns1/ns2.vercel-dns.com`, así que van en **Vercel → Domains →
    vetrosteelut.com**. Sin dominio verificado Resend solo deja enviar a la
    dirección de la propia cuenta.
 3. **API Keys → Create**, permiso *Sending access*. La clave se ve una sola vez.
@@ -259,9 +278,7 @@ src/
 │  ├─ seo.ts                   # tabla de metadatos por ruta, FAQ y grafo JSON-LD
 │  ├─ showcase.ts              # material de /projects (clips generados vs. obra real)
 │  └─ verticals.ts             # LAS VERTICALES: copy, producto, planos, proceso, huecos
-├─ lib/
-│  ├─ images.ts                # resolución de assets por clave
-│  └─ quote.ts                 # lógica del formulario (Request → Response, testeable)
+├─ lib/images.ts               # resolución de assets por clave
 ├─ assets/                     # fotografía y planos del catálogo (pasa por astro:assets)
 │  ├─ scenes/  products/  plans/
 ├─ layouts/Layout.astro        # <head>, Lenis, parallax, scroll-reveal
@@ -273,7 +290,7 @@ src/
 │  └─ [vertical].astro         # genera /commercial, /residential y /maintenance
 └─ styles/global.css           # tokens de marca, utilidades, animaciones
 
-api/quote.ts                   # Vercel Function: adaptador de src/lib/quote.ts
+api/quote.ts                   # Vercel Function del formulario (sin imports relativos)
 scripts/quote-check.mjs        # npm run test:quote
 vercel.json                    # cleanUrls — sin esto, 404 en toda subpágina
 ```

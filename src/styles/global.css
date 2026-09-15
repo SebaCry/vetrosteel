@@ -122,10 +122,6 @@ body {
   border-width: 0 1px 1px 0;
 }
 
-/* Duotone treatment for monochrome architectural imagery */
-.duotone {
-  filter: grayscale(1) contrast(1.05);
-}
 
 /* ------------------------------------------------------------------ */
 /*  Parallax                                                           */

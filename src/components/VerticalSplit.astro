@@ -11,7 +11,6 @@ import { verticals } from '../data/verticals';
  * third line left one panel alone in a half-empty row.
  */
 const count = verticals.length;
-const spelled = ['', 'One', 'Two', 'Three', 'Four', 'Five'][count] ?? String(count);
 
 // Panels sit three-up once there is room for it. An odd one out spans the full
 // width at the two-column breakpoint instead of leaving a hole beside it.
@@ -22,20 +21,16 @@ const isOddLast = (i: number) => count % 2 === 1 && i === count - 1;
 
 <section id="verticals" class="relative bg-ink text-warm-gray">
   <div class="mx-auto max-w-7xl px-5 sm:px-8 pt-24 sm:pt-28 pb-14">
+    <!-- Direct title, per client: the old "Where does your project sit?"
+         question said nothing about what we actually offer. -->
     <div class="max-w-2xl" data-reveal>
       <p class="eyebrow text-sand mb-6 flex items-center gap-3">
         <span class="inline-block w-9 h-px bg-sand rule-draw"></span>
-        {spelled} lines of work
+        Our services
       </p>
       <h2 class="font-display font-semibold text-4xl sm:text-5xl leading-[1.1] text-warm-gray">
-        Where does your project sit?
+        Commercial, residential &amp; maintenance
       </h2>
-      <p class="mt-7 text-base sm:text-lg leading-relaxed text-warm-gray/65">
-        The same hardware catalog and the same shop serve all of them — but the
-        drawings, the tolerances and the way we schedule the work are not the
-        same on a storefront as they are in a bathroom, and neither is a floor
-        we keep running month after month.
-      </p>
     </div>
   </div>
 
@@ -56,12 +51,10 @@ const isOddLast = (i: number) => count % 2 === 1 && i === count - 1;
             alt={v.hero.alt}
             fill
             sizes="(min-width:768px) 50vw, 100vw"
-            widths={[600, 900, 1400, 1900, 2600]}
-            duotone
-            class="transition-transform duration-[1200ms] ease-[cubic-bezier(0.16,1,0.3,1)] group-hover:scale-[1.04]"
+            widths={[600, 900, 1400, 1900, 2600]}            class="transition-transform duration-[1200ms] ease-[cubic-bezier(0.16,1,0.3,1)] group-hover:scale-[1.04]"
           />
 
-          <div class="absolute inset-0 bg-gradient-to-t from-ink via-ink/55 to-ink/15" />
+          <div class="absolute inset-0 bg-gradient-to-t from-ink from-15% via-ink/80 via-55% to-transparent" />
           <div class="absolute inset-0 ring-1 ring-inset ring-white/10" />
 
           <div class:list={['relative h-full flex flex-col justify-end p-8 sm:p-12', threeUp && 'lg:p-10']}>

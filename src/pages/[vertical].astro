@@ -30,6 +30,7 @@ interface Props {
 const { v } = Astro.props;
 
 const gap = (where: string) => v.gaps.find((g) => g.where === where);
+const isService = Boolean(v.serviceGroups?.length);
 ---
 
 <Layout
@@ -42,8 +43,22 @@ const gap = (where: string) => v.gaps.find((g) => g.where === where);
   <main id="main">
     <VerticalHero vertical={v} />
 
+    {
+      /* A service line opens on the services themselves — the client found the
+         maintenance page unclear when they sat below the intro and programme. */
+      isService && (
+        <ServiceChecklist
+          eyebrow="Maintenance"
+          title="Our maintenance services"
+          lead={v.intro.body[0]}
+          groups={v.serviceGroups!}
+          gap={gap('Client panel')}
+        />
+      )
+    }
+
     <!-- Intro -->
-    <section class="relative bg-paper text-ink py-24 sm:py-28">
+    {!isService && <section class="relative bg-paper text-ink py-24 sm:py-28">
       <div class="mx-auto max-w-7xl px-5 sm:px-8">
         <div class="grid lg:grid-cols-12 gap-10 lg:gap-16">
           <div class="lg:col-span-5" data-reveal>
@@ -64,14 +79,9 @@ const gap = (where: string) => v.gaps.find((g) => g.where === where);
           </div>
         </div>
       </div>
-    </section>
+    </section>}
 
-    <CategoryRow
-      eyebrow="What we do"
-      title="Systems we build"
-      lead={`The ${v.nav.toLowerCase()} side of the catalog, grouped the way projects actually get specified.`}
-      items={v.categories}
-    />
+    {!isService && <CategoryRow eyebrow="What we do" title="Systems we build" items={v.categories} />}
 
     {
       v.plans && v.plans.length > 0 && v.planIntro && (
@@ -99,21 +109,9 @@ const gap = (where: string) => v.gaps.find((g) => g.where === where);
     {
       v.programs && v.programs.length > 0 && (
         <ProgramGrid
-          title="What the subscription commits us to"
-          lead="Five standing commitments, the same every month — this is what you are buying, not a call-out list."
+          title="Why a monthly plan"
           items={v.programs}
           gap={gap('Plan tiers and pricing')}
-        />
-      )
-    }
-
-    {
-      v.serviceGroups && v.serviceGroups.length > 0 && (
-        <ServiceChecklist
-          title="What the visits cover"
-          lead="The work included in a standing plan, grouped the way a facilities manager checks it."
-          groups={v.serviceGroups}
-          gap={gap('Client panel')}
         />
       )
     }
@@ -121,16 +119,10 @@ const gap = (where: string) => v.gaps.find((g) => g.where === where);
     <ProcessSteps
       steps={v.process}
       title={v.slug === 'maintenance' ? 'From walk-through to sign-off' : undefined}
-      lead={
-        v.slug === 'maintenance'
-          ? 'Four stages, repeated every cycle — and we are the ones accountable at each of them.'
-          : undefined
-      }
     />
 
     <ProjectGallery
       title="Selected work"
-      lead={`${v.nav} installations in tempered glass and stainless steel.`}
       items={v.gallery}
       gaps={[gap('Project gallery'), gap('Before / after')].filter((g) => g !== undefined)}
     />

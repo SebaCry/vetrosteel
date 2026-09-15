@@ -18,7 +18,7 @@ const isActive = (href: string) => path === href || path.startsWith(`${href}/`);
          is a fifth of the screen permanently occupied — and it was overlapping
          the top of every page hero. -->
     <a href="/" class="flex items-center shrink-0" aria-label="Vetro Steel — home">
-      <Logo variant="full" tone="light" size="h-14 sm:h-20 lg:h-24 w-auto" />
+      <Logo variant="full" tone="light" size="h-12 sm:h-16 lg:h-[4.5rem] w-auto" />
     </a>
 
     <!-- Held back to `lg`: five nav items plus the quote button need about
@@ -31,7 +31,7 @@ const isActive = (href: string) => path === href || path.startsWith(`${href}/`);
             href={l.href}
             aria-current={isActive(l.href) ? 'page' : undefined}
             class:list={[
-              'relative px-3 lg:px-4 py-2.5 text-[0.84rem] tracking-[0.14em] uppercase font-semibold transition-colors duration-300',
+              'relative px-2.5 xl:px-4 py-2.5 text-[0.95rem] xl:text-base tracking-[0.1em] uppercase font-semibold transition-colors duration-300',
               isActive(l.href)
                 ? 'text-sand'
                 : 'text-warm-gray hover:text-sand',

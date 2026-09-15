@@ -19,13 +19,17 @@ const {
 } = Astro.props;
 
 const sizeClass = size ?? (variant === 'full' ? 'h-40 w-auto' : 'h-16 w-16');
-const toneClass = tone === 'light' ? 'brightness-0 invert' : 'brightness-100';
+// logo-light.png is logo.png with the teal ink turned to paper white and the
+// gold S kept, trimmed of its ~30% empty margin. The old `brightness-0 invert`
+// flattened the gold into a white silhouette, and the margin shrank the
+// wordmark to a few pixels — the client's "the logo can't be seen".
+const src = tone === 'light' ? '/logo-light.png' : '/logo.png';
 ---
 
 <img
-  src="/logo.png"
+  src={src}
   alt="Vetro Steel"
-  class={`shrink-0 object-contain ${sizeClass} ${toneClass} ${className}`}
+  class={`shrink-0 object-contain ${sizeClass} ${className}`}
   loading="eager"
   decoding="async"
 />

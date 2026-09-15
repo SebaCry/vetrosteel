@@ -1,28 +1,20 @@
 ---
 import { site } from '../data/site';
 import ClipPlayer from './ui/ClipPlayer.astro';
-import { stages } from '../data/showcase';
 
-// Background clip. `office-glass-suite` is the only one with no burnt-in
-// callouts and a single continuous camera move, which is what a backdrop
-// needs — the split-screen drawing clips have a white half that would sit
-// straight under the headline. Swapping this for the client's new clip is a
-// one-line change once the file lands in public/video.
-const bg = stages[2];
-
-// The hero runs a tighter window than the card on /projects. The clip is one
-// long push-in: it opens on a near-empty dark room and ends in a macro so close
-// it stops reading as glass. Only the middle stretch works as a backdrop.
-const bgStart = 1.8;
-const bgEnd = 5.0;
+// Background clip supplied by the client: a structural-glass lobby with spider
+// fittings. It is AI-generated (the Gemini sparkle sits bottom-right, where
+// ClipPlayer's background crop pushes it out of frame) and its last frame
+// matches its first, so it runs as a plain full loop with no playback window.
+const bg = { slug: 'lobby-glass-wall', title: 'Structural glass lobby with stainless spider fittings' };
 
 // The offer, said plainly and rotated. This is the "what do they actually
 // sell" line: a visitor should know inside two seconds.
 const offers = [
   'office partitions',
-  'a stainless handrail',
   'a shower enclosure',
-  'a storefront entrance',
+  'a glass railing',
+  'office maintenance',
 ];
 
 // Radiating "cable" lines — evokes the cable-stayed bridge of the brand deck
@@ -56,10 +48,8 @@ const rays = Array.from({ length: 26 }, (_, i) => {
     <ClipPlayer
       slug={bg.slug}
       title={bg.title}
-      start={bgStart}
-      end={bgEnd}
       variant="background"
-      class="absolute inset-0 opacity-70"
+      class="absolute inset-0"
     />
 
     <div class="absolute inset-0 blueprint-grid opacity-40"></div>
@@ -119,12 +109,12 @@ const rays = Array.from({ length: 26 }, (_, i) => {
             {offers.map((o, i) => (
               <span class:list={['rot-item', i === 0 && 'is-active']}>{o}?</span>
             ))}
-          </span><br class="hidden sm:block" />
-          <span class="text-sand">We draw it, fabricate it and install it.</span>
+          </span>{' '}<br class="hidden sm:block" />
+          <span class="text-sand">We design, install and maintain it.</span>
         </span>
         <span class="sr-only">
-          Need office partitions, a stainless handrail, a shower enclosure or a
-          storefront entrance? We draw it, fabricate it and install it.
+          Need office partitions, a shower enclosure, a glass railing or office
+          maintenance? We design, install and maintain it.
         </span>
       </p>
 
@@ -133,10 +123,8 @@ const rays = Array.from({ length: 26 }, (_, i) => {
         data-reveal
         style="--reveal-delay:250ms"
       >
-        Shower enclosures, sliding systems, railings and entrance systems in
-        tempered glass and stainless steel — specified from our own hardware
-        catalog, cut to dimensioned templates, and installed by the people who
-        drew them.
+        Glass and stainless steel for commercial and residential projects — plus
+        monthly maintenance plans for offices.
       </p>
 
       <div class="mt-10 flex flex-col sm:flex-row gap-4" data-reveal style="--reveal-delay:340ms">
@@ -144,7 +132,7 @@ const rays = Array.from({ length: 26 }, (_, i) => {
           href="#verticals"
           class="group inline-flex items-center justify-center gap-2 bg-sand text-ink font-semibold uppercase tracking-[0.14em] text-[0.82rem] px-7 py-4 hover:bg-sand-bright transition-colors duration-300"
         >
-          See what we do
+          Our services
           <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="transition-transform duration-300 group-hover:translate-x-1" aria-hidden="true">
             <path d="M5 12h14M13 6l6 6-6 6" stroke-linecap="round" stroke-linejoin="round" />
           </svg>
@@ -180,9 +168,9 @@ const rays = Array.from({ length: 26 }, (_, i) => {
     background:
       linear-gradient(
         to bottom,
-        rgba(7, 30, 36, 0.78) 0%,
-        rgba(7, 30, 36, 0.52) 40%,
-        rgba(7, 30, 36, 0.88) 100%
+        rgba(7, 30, 36, 0.7) 0%,
+        rgba(7, 30, 36, 0.35) 40%,
+        rgba(7, 30, 36, 0.85) 100%
       );
   }
   @media (min-width: 1024px) {
@@ -190,10 +178,10 @@ const rays = Array.from({ length: 26 }, (_, i) => {
       background:
         linear-gradient(
           90deg,
-          rgba(7, 30, 36, 0.95) 0%,
-          rgba(7, 30, 36, 0.86) 30%,
-          rgba(7, 30, 36, 0.55) 58%,
-          rgba(7, 30, 36, 0.28) 100%
+          rgba(7, 30, 36, 0.9) 0%,
+          rgba(7, 30, 36, 0.72) 30%,
+          rgba(7, 30, 36, 0.3) 58%,
+          rgba(7, 30, 36, 0.05) 100%
         ),
         linear-gradient(
           to bottom,
