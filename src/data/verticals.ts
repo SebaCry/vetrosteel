@@ -110,6 +110,13 @@ const PROCESS_ICONS = ['lucide:messages-square', 'lucide:ruler', 'lucide:factory
  * The three hero images under renders/ were supplied by the client and are
  * AI-generated (cropped to remove the Gemini sparkle). They are used as hero
  * backdrops only — never in a "Selected work" gallery, which shows real jobs.
+ *
+ * entrance-vestibule-glass, office-meeting-room-glass and deck-railing-sunset
+ * are the three replacements the client picked for "Systems we build" on
+ * commercial. They are also client AI renders, but they only reached us inside
+ * WhatsApp screenshots, so they are ~900px crops of those — enough for the card
+ * at 31vw, not for a hero. Replacing the files with the originals under the same
+ * names is the whole fix; the gap below keeps it on the list.
  */
 
 export const commercial: Vertical = {
@@ -134,19 +141,19 @@ export const commercial: Vertical = {
       icon: 'lucide:door-open',
       title: 'Entrance Systems',
       body: 'All-glass storefront doors and patch fittings built for daily traffic.',
-      image: 'scenes/office-glass-doors.jpg',
+      image: 'renders/entrance-vestibule-glass.jpg',
     },
     {
       icon: 'lucide:layout-panel-left',
       title: 'Office Partitions',
       body: 'Glass meeting rooms, workstation runs and full-height walls.',
-      image: 'projects/curved-glass-partition.jpg',
+      image: 'renders/office-meeting-room-glass.jpg',
     },
     {
       icon: 'lucide:fence',
       title: 'Railings & Guardrails',
       body: 'Spigot, channel and post-mounted glass for stairs, balconies and terraces.',
-      image: 'projects/facade-balcony-railing.jpg',
+      image: 'renders/deck-railing-sunset.jpg',
     },
   ],
   products: [
@@ -300,6 +307,11 @@ export const commercial: Vertical = {
     body: 'Drawings, a sketch or a photo with a tape in it — enough to size the system and come back with a real number.',
   },
   gaps: [
+    {
+      where: 'Systems we build',
+      needs:
+        'The three reference images at full resolution. The ones in place were rebuilt from WhatsApp screenshots (~900px wide), which is fine on these cards and too small for anything larger.',
+    },
     {
       where: 'Project gallery',
       needs:

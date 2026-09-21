@@ -14,11 +14,13 @@ const isActive = (href: string) => path === href || path.startsWith(`${href}/`);
     class="mx-auto max-w-7xl px-4 sm:px-8 flex items-center justify-between min-h-18 sm:min-h-24 py-1.5 sm:py-2"
     aria-label="Main"
   >
-    <!-- The full lockup at h-24 made the fixed bar 177px tall, which on a phone
-         is a fifth of the screen permanently occupied — and it was overlapping
-         the top of every page hero. -->
+    <!-- Sized up at the client's request ("logo aumento de tamaño"). The ceiling
+         is the header height: at lg the bar is logo + py-2 + border = 113px,
+         which is what `scroll-margin-top: 7.5rem` in global.css clears — a taller
+         logo means raising that too. (It once rendered at h-40 regardless of this
+         prop, a 177px bar; see the note in Logo.astro.) -->
     <a href="/" class="flex items-center shrink-0" aria-label="Vetro Steel — home">
-      <Logo variant="full" tone="light" size="h-12 sm:h-16 lg:h-[4.5rem] w-auto" />
+      <Logo variant="full" tone="light" size="h-14 sm:h-20 lg:h-24 w-auto" />
     </a>
 
     <!-- Held back to `lg`: five nav items plus the quote button need about

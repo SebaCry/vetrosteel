@@ -1,6 +1,7 @@
 ---
 import { site } from '../data/site';
 import ClipPlayer from './ui/ClipPlayer.astro';
+import Logo from './Logo.astro';
 
 // Background clip supplied by the client: a structural-glass lobby with spider
 // fittings. It is AI-generated (the Gemini sparkle sits bottom-right, where
@@ -80,7 +81,18 @@ const rays = Array.from({ length: 26 }, (_, i) => {
     <div class="absolute inset-x-0 bottom-0 h-40" style="background:linear-gradient(to top,#071e24, transparent);"></div>
   </div>
 
-  <div class="mx-auto max-w-7xl w-full px-5 sm:px-8 pt-36 sm:pt-32 lg:pt-28 pb-28 sm:pb-24">
+  <!-- Brand watermark. The client wanted the logo to carry more weight without
+       the page being redesigned, so it sits in the empty right half of the fold
+       (the copy column is capped at max-w-3xl) rather than repeating the lockup
+       under the nav's. Desktop only — on a phone the copy spans that space. -->
+  <div
+    class="hidden lg:block absolute right-10 xl:right-16 top-1/2 -translate-y-1/2 opacity-[0.22] pointer-events-none select-none"
+    aria-hidden="true"
+  >
+    <Logo variant="full" tone="light" size="h-72 xl:h-80 w-auto" />
+  </div>
+
+  <div class="relative mx-auto max-w-7xl w-full px-5 sm:px-8 pt-36 sm:pt-32 lg:pt-28 pb-28 sm:pb-24">
     <div class="max-w-3xl">
       <p class="eyebrow text-light-teal mb-7 flex items-center gap-3" data-reveal>
         <span class="inline-block w-9 h-px bg-sand"></span>
