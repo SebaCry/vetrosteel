@@ -3,7 +3,7 @@ import { Icon } from 'astro-icon/components';
 import MaterialNote from './MaterialNote.astro';
 import { contact } from '../../data/site';
 
-/** Phone, WhatsApp and social profiles — whichever of them `contact` has filled in. */
+/** Phone, WhatsApp and social profiles. Icons always show; they link once `contact` has the URL. */
 interface Props {
   class?: string;
   /** Flag missing links as pending material. Off in the footer, where it would repeat on every page. */
@@ -12,7 +12,10 @@ interface Props {
 const { class: className = '', note = true } = Astro.props;
 
 const { phoneDisplay, phoneDigits } = contact;
-const social = contact.social.filter((s) => s.href);
+const icons = [
+  ...contact.social,
+  { label: 'WhatsApp', icon: 'lucide:message-circle', href: phoneDigits ? `https://wa.me/${phoneDigits}` : '' },
+];
 const missing = [
   !phoneDigits && 'the phone number (also used for the WhatsApp link)',
   ...contact.social.filter((s) => !s.href).map((s) => `the ${s.label} profile URL`),
@@ -29,40 +32,36 @@ const missing = [
             {phoneDisplay || `+${phoneDigits}`}
           </a>
         </li>
-        <li>
-          <a
-            href={`https://wa.me/${phoneDigits}`}
-            target="_blank"
-            rel="noopener"
-            class="inline-flex items-center gap-2.5 hover:text-sand transition-colors"
-          >
-            <Icon name="lucide:message-circle" class="size-4 text-sand" />
-            WhatsApp
-          </a>
-        </li>
       </ul>
     )
   }
 
-  {
-    social.length > 0 && (
-      <ul class="mt-5 flex gap-3">
-        {social.map((s) => (
-          <li>
-            <a
-              href={s.href}
-              target="_blank"
-              rel="noopener"
-              aria-label={s.label}
-              class="grid place-items-center size-10 border border-white/15 text-warm-gray/75 hover:text-sand hover:border-sand transition-colors"
-            >
-              <Icon name={s.icon} class="size-[1.15rem]" />
-            </a>
-          </li>
-        ))}
-      </ul>
-    )
-  }
+  <!-- Always shown (client wants the icons visible now). An icon without its
+       URL yet renders as a plain badge rather than a dead link. -->
+  <ul class="mt-5 flex gap-3">
+    {icons.map((s) => (
+      <li>
+        {s.href ? (
+          <a
+            href={s.href}
+            target="_blank"
+            rel="noopener"
+            aria-label={s.label}
+            class="grid place-items-center size-10 border border-white/15 text-warm-gray/75 hover:text-sand hover:border-sand transition-colors"
+          >
+            <Icon name={s.icon} class="size-[1.15rem]" />
+          </a>
+        ) : (
+          <span
+            title={s.label}
+            class="grid place-items-center size-10 border border-white/15 text-warm-gray/75"
+          >
+            <Icon name={s.icon} class="size-[1.15rem]" aria-label={s.label} />
+          </span>
+        )}
+      </li>
+    ))}
+  </ul>
 
   {note && missing.length > 0 && <MaterialNote where="Phone & social links" needs={`Still needed: ${missing.join(', ')}.`} />}
 </div>
