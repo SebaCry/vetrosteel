@@ -1,11 +1,12 @@
 ---
 import { site } from '../../data/site';
+import type { Vertical } from '../../data/verticals';
 
 interface Props {
   headline: string;
   body: string;
   /** Pre-selects the vertical on the quote form. */
-  vertical?: 'commercial' | 'residential';
+  vertical?: Vertical['slug'];
   label?: string;
 }
 

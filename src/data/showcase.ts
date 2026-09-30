@@ -92,7 +92,13 @@ export const stages: Stage[] = [
   },
 ];
 
-/** Split-screen clips where the drawing wipes across into the built result. */
+/**
+ * Split-screen clips where the drawing wipes across into the built result.
+ *
+ * Client asked for only one here (Sugerencias 3, item 2: "Video 2A", re-sent
+ * as requeriments/media/Video2.mp4 — byte-identical to elevation-to-facade).
+ * elevation-to-portico.mp4 is no longer referenced.
+ */
 export const transitions: Transition[] = [
   {
     slug: 'elevation-to-facade',
@@ -105,18 +111,6 @@ export const transitions: Transition[] = [
     // start dropping characters.
     start: 0.0,
     end: 4.4,
-  },
-  {
-    slug: 'elevation-to-portico',
-    title: 'Portico framing',
-    note: 'Structural framing drawing against the finished colonnade and glazing line.',
-    before: 'Framing plan',
-    after: 'Built',
-    watermark: true,
-    // Cuts at 4.6: at 5.7 the clip draws red X marks over its own callouts
-    // and the labels switch to Spanish.
-    start: 0.0,
-    end: 4.6,
   },
 ];
 
@@ -135,8 +129,13 @@ export const spaces: Clip[] = [
     title: 'Stair and landing',
     note: 'Handrail returning into the landing balustrade without a visible joint.',
     watermark: true,
+    // Re-cut (Sugerencias 3, item 4): the generated callouts ("Deep Teal",
+    // "Monsterret") are gone. The file now plays the source to 2.2s, before
+    // they appear, then holds that frame under the client's two labels —
+    // stainless tube 304 × 2″ and button 1/4″. 4.8s long; the original 10s
+    // clip is in git history.
     start: 0.0,
-    end: 4.0,
+    end: 4.7,
   },
   {
     slug: 'office-partitions-run',

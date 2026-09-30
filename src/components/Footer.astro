@@ -1,5 +1,6 @@
 ---
 import Logo from './Logo.astro';
+import ContactLinks from './ui/ContactLinks.astro';
 import { site, footerNav } from '../data/site';
 
 const year = new Date().getFullYear();
@@ -42,6 +43,7 @@ const year = new Date().getFullYear();
           <li>{site.region}</li>
           <li class="text-warm-gray/45">Consulting · Development · Innovation</li>
         </ul>
+        <ContactLinks class="mt-5" note={false} />
       </div>
     </div>
 

@@ -151,7 +151,9 @@ $env:PUBLIC_SHOW_GAPS='true'; npm run build  # PowerShell
 ```
 
 Outstanding: real installed-work photography, dimensioned office-partition drawings, per-hardware technical
-sheets, and matched before/after pairs (README has the detail).
+sheets, and matched before/after pairs (README has the detail). Also the phone number and social URLs
+(`contact` in `src/data/site.ts` — fill them in and `ContactLinks` renders phone, WhatsApp and icons), and
+team photos with names/roles for the About page.
 
 ## Deploy
 

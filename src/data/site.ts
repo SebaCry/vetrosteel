@@ -3,6 +3,25 @@
  * Terminology here is taken verbatim from the client's own product catalog
  * (PRODUCT CATALOG — MAY 2026, "Premium Glass Hardware & Architectural Systems").
  */
+
+/**
+ * Phone and social profiles, rendered by <ContactLinks> in the footer and on
+ * /quote. The client asked for them (Sugerencias 3, item 6) but has not sent
+ * the number or the profile URLs yet: anything left empty is simply not shown,
+ * and the preview build flags it as pending material.
+ */
+export const contact = {
+  /** As printed, e.g. '(801) 555-0123'. */
+  phoneDisplay: '',
+  /** Digits only with country code, e.g. '18015550123'. Also the WhatsApp number. */
+  phoneDigits: '',
+  social: [
+    { label: 'Instagram', icon: 'lucide:instagram', href: '' },
+    { label: 'Facebook', icon: 'lucide:facebook', href: '' },
+    { label: 'LinkedIn', icon: 'lucide:linkedin', href: '' },
+  ],
+};
+
 export const site = {
   legalName: 'Vetro Steel Design Studio LLC',
   name: 'Vetro Steel',
@@ -40,8 +59,8 @@ export const site = {
     'St. George',
   ],
 
-  /** Profiles for schema.org sameAs. Add real URLs as they exist. */
-  sameAs: [] as string[],
+  /** Profiles for schema.org sameAs — whichever of `contact.social` are filled in. */
+  sameAs: contact.social.map((s) => s.href).filter(Boolean),
 
   /** Catalog cover taxonomy, in the client's wording and order. */
   catalogCategories: [
@@ -69,5 +88,5 @@ export const footerNav = [
   { label: 'About', href: '/about' },
   { label: 'Capabilities', href: '/about#capabilities' },
   { label: 'Values', href: '/about#values' },
-  { label: 'Request a Quote', href: '/quote' },
+  { label: 'Contact Us', href: '/quote' },
 ] as const;

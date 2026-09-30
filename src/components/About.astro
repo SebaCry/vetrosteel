@@ -1,6 +1,7 @@
 ---
 import { Icon } from 'astro-icon/components';
-import Figure from './ui/Figure.astro';
+import ClipPlayer from './ui/ClipPlayer.astro';
+import MaterialNote from './ui/MaterialNote.astro';
 
 interface Props {
   /** Home runs the short version and links out; /about runs it in full. */
@@ -13,6 +14,16 @@ const attributes = [
   { icon: 'lucide:building-2', title: 'Architectural', sub: 'Strong & stable' },
   { icon: 'lucide:gem', title: 'Sophisticated', sub: 'Premium feel' },
   { icon: 'lucide:scan-line', title: 'Detail-Oriented', sub: 'Design focused' },
+];
+
+// The client wants a company profile with the team on it (Sugerencias 3,
+// item 5). Nothing has been sent for it yet, so it is not built with stand-ins.
+const gaps = [
+  {
+    where: 'Team profile',
+    needs:
+      'A photo of each team member with their name and role, plus a short company profile text. The section is built once these arrive.',
+  },
 ];
 ---
 
@@ -40,19 +51,20 @@ const attributes = [
       </div>
 
       <div class="lg:col-span-6" data-reveal style="--reveal-delay:150ms">
-        <div class="tick-frame p-3">
-          <Figure
-            src="projects/steel-bench-orange.jpg"
-            alt="Fabricated stainless steel bench with an orange powder-coated frame"
-            ratio="aspect-[4/5] sm:aspect-[5/4]"
-            sizes="(min-width:1024px) 46vw, 92vw"
-            widths={[500, 800, 1200]}
-          >
-            <div class="absolute inset-0 bg-deep-teal/20 mix-blend-multiply" />
-          </Figure>
-        </div>
+        <!-- The bench photo went at the client's request (Sugerencias 3, item 5).
+             Their studio clip replaces it, from 1.7s: the logo intro before
+             that misspells the descriptor ("STUMIC - STURES"). Kept 16:9 so
+             the "Vetro Steel" / "Studio - Design" wipes are not cropped. -->
+        <figure>
+          <div class="tick-frame p-3">
+            <ClipPlayer slug="studio-at-work" title="The Vetro Steel studio at work" watermark start={1.7} end={8.4} />
+          </div>
+          <figcaption class="mt-3 text-xs text-ink/45">Visualisation of the studio workflow.</figcaption>
+        </figure>
       </div>
     </div>
+
+    {!compact && gaps.map((g) => <MaterialNote where={g.where} needs={g.needs} />)}
 
     <!-- Brand attributes -->
     {!compact && (

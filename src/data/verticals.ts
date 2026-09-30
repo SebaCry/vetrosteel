@@ -90,6 +90,8 @@ export interface Vertical {
   serviceGroups?: ServiceGroup[];
   process: ProcessStep[];
   gallery: GalleryItem[];
+  /** Shown under the gallery title — used to say when the gallery is not photography. */
+  galleryLead?: string;
   cta: { headline: string; body: string };
   /** Material the client still owes us. Surfaced by <MaterialNote>. */
   gaps: { where: string; needs: string }[];
@@ -110,6 +112,9 @@ const PROCESS_ICONS = ['lucide:messages-square', 'lucide:ruler', 'lucide:factory
  * The three hero images under renders/ were supplied by the client and are
  * AI-generated (cropped to remove the Gemini sparkle). They are used as hero
  * backdrops only — never in a "Selected work" gallery, which shows real jobs.
+ * The one exception is maintenance, whose gallery the client replaced with
+ * stills from their own vinyl-film clip (requeriments/media/VIDEO1A.mp4); that
+ * gallery says so in its lead rather than passing them off as site photos.
  *
  * entrance-vestibule-glass, office-meeting-room-glass and deck-railing-sunset
  * are the three replacements the client picked for "Systems we build" on
@@ -632,23 +637,28 @@ export const maintenance: Vertical = {
     { icon: 'lucide:hard-hat', title: 'Service Visit', body: 'Our crew works the agreed window — after hours if needed.' },
     { icon: 'lucide:file-check', title: 'Report & Sign-Off', body: 'You get the report and checklist for every visit.' },
   ],
+  // Client request (Sugerencias 3, item 3): the clinic, office-door and
+  // stainless-frame photos were removed for vinyl work. Stills cropped from
+  // requeriments/media/VIDEO1A.mp4 — portrait crops that also leave out the
+  // Gemini sparkle in the corner.
   gallery: [
     {
-      image: 'projects/clinic-glass-screen.jpg',
-      label: 'Clinic Glass Screen',
-      note: 'Glazed division kept clean and serviced.',
+      image: 'renders/vinyl-film-applying.jpg',
+      label: 'Frosted Film',
+      note: 'Privacy film laid onto an office glass partition.',
     },
     {
-      image: 'scenes/office-glass-doors.jpg',
-      label: 'Glazed Office Doors',
-      note: 'Hinges and locks checked on every visit.',
+      image: 'renders/vinyl-film-squeegee.jpg',
+      label: 'Bubble-Free Finish',
+      note: 'Squeegeed flat from the centre out.',
     },
     {
-      image: 'projects/gym-stainless-frames.jpg',
-      label: 'Stainless Framing',
-      note: 'Steel and glass maintained on the same plan.',
+      image: 'renders/vinyl-logo-finished.jpg',
+      label: 'Branded Vinyl',
+      note: 'Your logo cut into the frosted band.',
     },
   ],
+  galleryLead: 'Vinyl design and installation on office glass. Images are visualisations of the service.',
   cta: {
     headline: 'Ask for a maintenance walk-through',
     body: 'Tell us your floor area and we will come back with a visit schedule and a monthly figure.',
@@ -657,7 +667,7 @@ export const maintenance: Vertical = {
     {
       where: 'Project gallery',
       needs:
-        'Photographs of the maintenance crew at work — painting, drywall repair, furniture assembly, glass cleaning. The hero is an AI-generated illustration supplied by the client; real photographs of completed maintenance work are still needed for this gallery.',
+        'Photographs of the maintenance crew at work — vinyl, painting, drywall repair, furniture assembly, glass cleaning. The gallery now shows stills from the client-supplied vinyl clip and the hero is an AI illustration; real photographs of completed work are still needed.',
     },
     {
       where: 'Plan tiers and pricing',

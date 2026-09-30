@@ -5,6 +5,7 @@ import Footer from '../components/Footer.astro';
 import PageHeader from '../components/ui/PageHeader.astro';
 import QuoteForm from '../components/QuoteForm.astro';
 import Faq from '../components/Faq.astro';
+import ContactLinks from '../components/ui/ContactLinks.astro';
 import { site } from '../data/site';
 import { verticals } from '../data/verticals';
 
@@ -78,6 +79,7 @@ const steps = [
                 <br />
                 <a href={`mailto:${site.email}`} class="text-sand hover:underline">{site.email}</a>
               </p>
+              <ContactLinks class="mt-5 text-warm-gray/75" />
             </div>
           </aside>
 

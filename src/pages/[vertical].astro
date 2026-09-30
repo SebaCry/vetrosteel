@@ -123,6 +123,7 @@ const isService = Boolean(v.serviceGroups?.length);
 
     <ProjectGallery
       title="Selected work"
+      lead={v.galleryLead}
       items={v.gallery}
       gaps={[gap('Project gallery'), gap('Before / after')].filter((g) => g !== undefined)}
     />

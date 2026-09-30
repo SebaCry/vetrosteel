@@ -1,0 +1,68 @@
+---
+import { Icon } from 'astro-icon/components';
+import MaterialNote from './MaterialNote.astro';
+import { contact } from '../../data/site';
+
+/** Phone, WhatsApp and social profiles — whichever of them `contact` has filled in. */
+interface Props {
+  class?: string;
+  /** Flag missing links as pending material. Off in the footer, where it would repeat on every page. */
+  note?: boolean;
+}
+const { class: className = '', note = true } = Astro.props;
+
+const { phoneDisplay, phoneDigits } = contact;
+const social = contact.social.filter((s) => s.href);
+const missing = [
+  !phoneDigits && 'the phone number (also used for the WhatsApp link)',
+  ...contact.social.filter((s) => !s.href).map((s) => `the ${s.label} profile URL`),
+].filter(Boolean);
+---
+
+<div class={className}>
+  {
+    phoneDigits && (
+      <ul class="space-y-3 text-sm">
+        <li>
+          <a href={`tel:+${phoneDigits}`} class="inline-flex items-center gap-2.5 hover:text-sand transition-colors">
+            <Icon name="lucide:phone" class="size-4 text-sand" />
+            {phoneDisplay || `+${phoneDigits}`}
+          </a>
+        </li>
+        <li>
+          <a
+            href={`https://wa.me/${phoneDigits}`}
+            target="_blank"
+            rel="noopener"
+            class="inline-flex items-center gap-2.5 hover:text-sand transition-colors"
+          >
+            <Icon name="lucide:message-circle" class="size-4 text-sand" />
+            WhatsApp
+          </a>
+        </li>
+      </ul>
+    )
+  }
+
+  {
+    social.length > 0 && (
+      <ul class="mt-5 flex gap-3">
+        {social.map((s) => (
+          <li>
+            <a
+              href={s.href}
+              target="_blank"
+              rel="noopener"
+              aria-label={s.label}
+              class="grid place-items-center size-10 border border-white/15 text-warm-gray/75 hover:text-sand hover:border-sand transition-colors"
+            >
+              <Icon name={s.icon} class="size-[1.15rem]" />
+            </a>
+          </li>
+        ))}
+      </ul>
+    )
+  }
+
+  {note && missing.length > 0 && <MaterialNote where="Phone & social links" needs={`Still needed: ${missing.join(', ')}.`} />}
+</div>

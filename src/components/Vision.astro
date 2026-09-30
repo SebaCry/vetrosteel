@@ -1,7 +1,4 @@
 ---
-import { Image } from 'astro:assets';
-import { asset } from '../lib/images';
-
 const horizons = [
   {
     tag: 'Near term',
@@ -31,20 +28,18 @@ const horizons = [
     </div>
 
     <div class="grid lg:grid-cols-12 gap-8 lg:gap-10 items-stretch">
-      <!-- image -->
+      <!-- Animated logo. Replaced the office-doors photo at the client's request
+           ("reemplazar imagen por logo dinámico", Sugerencias 3, item 7). -->
       <div class="lg:col-span-4" data-reveal>
         <div class="tick-frame p-3 h-full">
-          <div class="relative overflow-hidden h-full min-h-72">
-            <Image
-              src={asset('scenes/office-glass-doors.jpg')}
-              alt="Glazed office partition with framed door leaves"
-              widths={[500, 800, 1100]}
-              sizes="(min-width:1024px) 30vw, 92vw"
-              loading="lazy"
-              decoding="async"
-              class="w-full h-full object-cover"
-            />
-            <div class="absolute inset-0 bg-deep-teal/30 mix-blend-multiply"></div>
+          <div class="relative overflow-hidden h-full min-h-72 bg-deep-teal/35 grid place-items-center">
+            <div class="absolute inset-0 blueprint-grid opacity-60"></div>
+            <span class="vision-ring" aria-hidden="true"></span>
+            <span class="vision-ring vision-ring--inner" aria-hidden="true"></span>
+            <div class="vision-mark relative w-3/5 max-w-64">
+              <img src="/logo-light.png" alt="Vetro Steel" width="378" height="273" class="w-full h-auto" loading="lazy" decoding="async" />
+              <span class="vision-shine" aria-hidden="true"></span>
+            </div>
           </div>
         </div>
       </div>
@@ -83,3 +78,61 @@ const horizons = [
     </div>
   </div>
 </section>
+
+<style>
+  /* Two dashed rings turning in opposite directions behind the mark. */
+  .vision-ring {
+    position: absolute;
+    width: min(78%, 20rem);
+    aspect-ratio: 1;
+    border-radius: 9999px;
+    border: 1px dashed color-mix(in srgb, var(--color-sand) 35%, transparent);
+    animation: vision-spin 40s linear infinite;
+  }
+  .vision-ring--inner {
+    width: min(58%, 15rem);
+    border-style: solid;
+    border-color: color-mix(in srgb, var(--color-light-teal) 22%, transparent);
+    border-top-color: var(--color-sand);
+    animation-duration: 9s;
+    animation-direction: reverse;
+  }
+
+  .vision-mark {
+    animation: vision-float 6s ease-in-out infinite;
+  }
+
+  /* A light sweep clipped to the logo's own pixels. */
+  .vision-shine {
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(110deg, transparent 35%, rgba(255, 255, 255, 0.75) 50%, transparent 65%) no-repeat;
+    background-size: 250% 100%;
+    -webkit-mask: url('/logo-light.png') center / contain no-repeat;
+    mask: url('/logo-light.png') center / contain no-repeat;
+    animation: vision-sweep 4.5s ease-in-out infinite;
+  }
+
+  @keyframes vision-spin {
+    to { transform: rotate(360deg); }
+  }
+  @keyframes vision-float {
+    0%, 100% { transform: translateY(0); }
+    50% { transform: translateY(-8px); }
+  }
+  @keyframes vision-sweep {
+    0% { background-position: 150% 0; }
+    55%, 100% { background-position: -50% 0; }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .vision-ring,
+    .vision-mark,
+    .vision-shine {
+      animation: none;
+    }
+    .vision-shine {
+      display: none;
+    }
+  }
+</style>
